@@ -1,0 +1,77 @@
+;   c l a r
+; + k s o n
+; ---------
+; c l a s s
+; letters = [c,l,a,r,k,s,o,n,l]
+; c != 0 -> c is carry -> c = 1
+; k != 0 
+
+(declare-const c Int)
+(declare-const l Int)
+(declare-const a Int)
+(declare-const r Int)
+(declare-const k Int)
+(declare-const s Int)
+(declare-const o Int)
+(declare-const n Int)
+
+; letters represent 1 - 9
+(assert (and (>= c 0) (<= c 9)))
+(assert (and (>= l 0) (<= l 9)))
+(assert (and (>= a 0) (<= a 9)))
+(assert (and (>= r 0) (<= r 9)))
+(assert (and (>= k 0) (<= k 9)))
+(assert (and (>= s 0) (<= s 9)))
+(assert (and (>= o 0) (<= o 9)))
+(assert (and (>= n 0) (<= n 9)))
+
+; No letters can be the same value
+; (assert (not (= c l a r k s o n)))
+; Above let them all equal 1, 0 or 9
+; Although more tedious, this works
+(assert (not (= c l)))
+(assert (not (= c a)))
+(assert (not (= c r)))
+(assert (not (= c k)))
+(assert (not (= c s)))
+(assert (not (= c o)))
+(assert (not (= c n)))
+
+(assert (not (= l a)))
+(assert (not (= l r)))
+(assert (not (= l k)))
+(assert (not (= l s)))
+(assert (not (= l o)))
+(assert (not (= l n)))
+
+(assert (not (= a r)))
+(assert (not (= a k)))
+(assert (not (= a s)))
+(assert (not (= a o)))
+(assert (not (= a n)))
+
+(assert (not (= r k)))
+(assert (not (= r s)))
+(assert (not (= r o)))
+(assert (not (= r n)))
+
+(assert (not (= k s)))
+(assert (not (= k o)))
+(assert (not (= k n)))
+
+(assert (not (= s o)))
+(assert (not (= s n)))
+
+(assert (not (= o n)))
+
+; The start of a number cant be 0 (only c and k start numbers)
+(assert (not (= c 0)))
+(assert (not (= k 0)))
+
+; the formula given
+(assert (= (+ (* c 10000) (* l 1000) (* a 100) (* s 10) s) (+ (+ (* c 1000) (* l 100) (* a 10) r) (+ (* k 1000) (* s 100) (* o 10) n))))
+
+
+(check-sat)
+(get-model)
+

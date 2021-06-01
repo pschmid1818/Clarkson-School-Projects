@@ -1,0 +1,18 @@
+timeout
+
+When run I get timeout, this was after I corrected a typp in the given cells.
+Before it had two 1's in the top row and gave an unsat, this is expected.
+Without the any of given it gaves a sat, which is also expected.
+However, without the given now, it gives a timeout as well.
+I think there may be an issue with rise4fun.
+
+--- On Refresh
+sat
+timeout
+
+This is without (get-model) so there isnt much I can say besides that it is sat with
+4 1 3 1
+2 3 4 2
+1 4 2 3
+3 2 1 4
+When I try to do it with (get-model) it just times out.

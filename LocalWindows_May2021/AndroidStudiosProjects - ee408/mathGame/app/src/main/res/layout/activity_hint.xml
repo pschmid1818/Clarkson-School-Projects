@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_hint"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="edu.clarkson.ee408.MainActivity">
+
+    <TextView
+        android:id="@+id/hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="130dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="Hint"
+        android:textSize="50dp" />
+
+    <ImageView
+        android:id="@+id/imgOp1"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/hint"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/operator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hint"
+        android:layout_marginLeft="140dp"
+        android:layout_marginTop="60dp"
+        android:textSize="50dp" />
+
+    <ImageView
+        android:id="@+id/imgOp2"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/hint"
+        android:layout_toRightOf="@id/imgOp1"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="200dp"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/equals"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/hint"
+        android:layout_marginLeft="320dp"
+        android:layout_marginTop="60dp"
+        android:text="="
+        android:textSize="50dp" />
+
+    <ImageView
+        android:id="@+id/imgAns1"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/operator"
+        android:layout_toRightOf="@id/imgOp1"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="50dp"/>
+
+    <ImageView
+        android:id="@+id/imgAns2"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/operator"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="170dp"
+        android:layout_marginTop="50dp"
+        android:layout_toRightOf="@id/imgAns1"/>
+
+</RelativeLayout>

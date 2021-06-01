@@ -1,0 +1,75 @@
+; variable declaration using datatypes
+; megapixels will be ints
+
+(declare-datatypes ()((name adam audrey cynthia kassandra)))
+
+; ie = internet explorer
+(declare-datatypes ()((browser firefox ie opera safari)))
+
+(declare-datatypes ()((camera cannon casio kodak polariod)))
+
+
+; mapping names to other datatypes
+(declare-fun b(name) browser)
+(declare-fun c(name) camera)
+;megapixels -> 1.8 = 1, 3.2 = 2, 4.0 = 3, 7.0 = 4
+(declare-fun m(name) Int)
+(assert (and (>= (m adam) 1) (<= (m adam) 4)))
+(assert (and (>= (m audrey) 1) (<= (m audrey) 4)))
+(assert (and (>= (m cynthia) 1) (<= (m cynthia) 4)))
+(assert (and (>= (m kassandra) 1) (<= (m kassandra) 4)))
+
+
+; inverse functions
+(declare-fun binv(browser) name)
+(declare-fun cinv(camera) name)
+(declare-fun minv(Int) name)
+
+; ensure inverse is the inverse of its function 
+(assert (= (binv (b adam)) adam))
+(assert (= (binv (b audrey)) audrey))
+(assert (= (binv (b cynthia)) cynthia))
+(assert (= (binv (b kassandra)) kassandra))
+(assert (= (cinv (c adam)) adam))
+(assert (= (cinv (c audrey)) audrey))
+(assert (= (cinv (c cynthia)) cynthia))
+(assert (= (cinv (c kassandra)) kassandra))
+(assert (= (minv (m adam)) adam))
+(assert (= (minv (m audrey)) audrey))
+(assert (= (minv (m cynthia)) cynthia))
+(assert (= (minv (m kassandra)) kassandra))
+
+
+; Given Rules
+; 1. Of Audrey and the photographer with the Canon camera, 
+;    one only uses Safari for their web surfing and the other has the 4.0 megapixel camera.
+(assert (or (and (= (b audrey) safari) (= (m (cinv cannon)) 4)) (and (= (b (cinv cannon)) safari) (= (m audrey) 4))))
+
+; 2. The photographer with the Kodak camera is Cynthia.
+(assert (= (c cynthia) kodak))
+
+; 3. The person with the 4.0 megapixel camera can't stand using the Internet Explorer browser.
+(assert (not (= (b (minv 4)) ie)))
+
+; 4. The person who prefers using the Internet Explorer browser has a camera 
+;    with more megapixels than the photographer with the Polaroid camera.
+(assert (> (m (binv ie)) (m (cinv polariod))))
+
+; 5. Either the photographer with the Kodak camera or the photographer 
+;    with the Polaroid camera only uses Firefox for their web surfing.
+(assert (or (= (b (cinv kodak)) firefox) (= (b (cinv polariod)) firefox)))
+
+; 6. The person with the 1.8 megapixel camera is Cynthia.
+(assert (= (m cynthia) 1))
+
+; 7. The person who prefers using the Internet Explorer browser is not Kassandra.
+(assert (not (= (b kassandra) ie)))
+
+; 8. The person who prefers using the Safari browser is Audrey.
+(assert (= (b audrey) safari))
+
+; 9. The photographer with the Canon camera has a camera with more megapixels than Audrey
+(assert (> (m (cinv cannon)) (m audrey)))
+
+(check-sat)
+(get-model)

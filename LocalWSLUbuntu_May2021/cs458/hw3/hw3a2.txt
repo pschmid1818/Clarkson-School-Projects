@@ -1,0 +1,43 @@
+sat
+(model 
+  (define-fun s () Int
+    2)
+  (define-fun c () Int
+    1)
+  (define-fun a () Int
+    3)
+  (define-fun l () Int
+    0)
+  (define-fun k () Int
+    9)
+  (define-fun o () Int
+    8)
+  (define-fun n () Int
+    7)
+  (define-fun r () Int
+    5)
+)
+
+c = 1
+l = 0
+a = 3
+r = 5
+k = 9
+s = 2
+o = 8
+n = 7
+
+  c l a r
++ k s o n
+---------
+c l a s s
+
+|
+V
+
+  1 0 3 5
++ 9 2 8 7
+---------
+1 0 3 2 2
+
+All letters have unique numbers and all add correctly.

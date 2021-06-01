@@ -1,0 +1,104 @@
+#include<iostream>
+#include<cstring>
+#include<locale>
+using namespace std;
+
+string name();
+string state();
+
+int main()
+{
+	cout <<"What is your first name?\n";
+	string firstname;
+	firstname=name();
+	
+	cout <<"What is your last name?\n";
+        string lastname;
+        lastname=name();
+
+	cout <<"What is your middle name?\n(Note:type 'none' to opt out)\n";
+        string middlename;
+        middlename=name();
+
+	string code;
+	code=state();
+
+        return 0;
+}
+
+string name()
+//I understand that the question says to use a function fo each however because of the similar naming conventions I opted to use an overloaded funtion for file size
+//
+{
+	string name;
+        cin >>name;
+
+        bool check=false;
+
+        do
+        {
+	int length=name.length();
+
+                for(int c=0; c<=length-1; c++)
+                {
+                        if (name[c]=='!'||name[c]=='@'||name[c]=='#'||name[c]=='$'||name[c]=='%'||name[c]=='^'||name[c]=='&'||name[c]=='*'||name[c]=='('||name[c]==')'||name[c]=='_'||name[c]=='+'||name[c]=='-'||name[c]=='='||name[c]=='{'||name[c]=='}'||name[c]=='['||name[c]==']'||name[c]==':'||name[c]==';'||name[c]=='<'||name[c]=='>'||name[c]==','||name[c]=='.'||name[c]=='~'||name[c]=='|'||name[c]=='?'||name[c]=='1'||name[c]=='2'||name[c]=='3'||name[c]=='4'||name[c]=='5'||name[c]=='6'||name[c]=='7'||name[c]=='8'||name[c]=='9'||name[c]=='0')
+                       	{
+				cout <<"Error: No special characters\nTry again:";
+                		cin >>name;
+			}
+		}
+        	if(length<2||length>10)
+        	{
+        	        cout <<"Error: name must be larger than 2 digits and less than 10\nTray again:";
+        		cin >>name;
+		}
+        	else if(name=="none")
+        	{
+        	        name="";
+        		check=true;
+		}
+        	else
+        	{
+        	        check=true;
+        	}
+	}
+	while(!check);
+	
+	return name;
+}
+
+string state()
+{
+	cout <<"What is your state code (ex. NY)\n";
+	string state;
+	cin >>state;
+	bool sheck=false;
+
+	do
+	{
+		int length=state.length();
+		if(length==2)
+		{
+			char t1=state[0];
+			char t2=state[1];
+			locale loc;
+			if(isupper(t1,loc) && isupper(t2,loc))
+			{
+				sheck=true;
+			}
+			else
+			{
+				cout <<"Error: must be uppercase\nTry again: ";
+				cin >>state;
+			}
+		}
+		else
+		{
+			cout <<"Error: length must be 2 characters\nTry again: ";
+			cin >> state;
+		}
+	}
+	while(!sheck);
+
+	return state;
+}

@@ -1,0 +1,53 @@
+drawPloy.py:
+
+def drawSquare(myTurtle, sideLength):
+    myTurtle.forward(sideLength) #side 1
+    myTurtle.right(90)
+    myTurtle.forward(sideLength) #side 2
+    myTurtle.right(90)
+    myTurtle.forward(sideLength) #side 3
+    myTurtle.right(90)
+    myTurtle.forward(sideLength) #side 4
+    myTurtle.right(90)
+
+def drawTriangle(myTurtle, sideLength):
+       for i in range(3):
+           myTurtle.forward(sideLength)
+           myTurtle.right(120)
+
+def drawPolygon(myTurtle, sideLength, numSides):
+       turnAngle = 360 / numSides
+       for i in range(numSides):
+           myTurtle.forward(sideLength)
+           myTurtle.right(turnAngle)
+
+def drawCircle(myTurtle, radius):
+       circumference = 2 * 3.1415 * radius
+       sideLength = circumference / 360
+       drawPolygon(myTurtle, sideLength, 360)
+
+drawSpiral.py
+
+def drawSpiral(myTurtle, maxSide):
+       for sideLength in range(1, maxSide + 1, 5):
+           myTurtle.forward(sideLength)
+           myTurtle.right(90)
+
+main.py
+
+#Initially the turtle is positioned in the center of the screen and pointed to the right.
+#The code below first draws two squares.
+# Next it heads the turtle 45 degree north east
+# and advances it for a distance of 200.
+# Lastly, it draws a circle and a spiral of 100 sides.
+
+turtle=turtle.Turtle()
+
+drawSquare(turtle,100)
+drawSquare(turtle,200)
+turtle.left(45)
+turtle.forward(200)
+
+drawCircle(turtle, 50)
+
+spiral.drawSpiral(turtle, 100)

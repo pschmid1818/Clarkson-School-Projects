@@ -1,0 +1,316 @@
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style type="text/css">
+		.header {
+		  padding: 20px;
+		  text-align: center;
+		  background: #8DAABA;
+		  color: black;
+		  border: 2px solid black;
+		  font-size: 30px;
+		}
+		
+		/* The side navigation menu */
+		.sidebar {
+		  margin: 0;
+		  padding: 0;
+		  width: 250px;
+		  border-left: 2px solid black;
+		  border-right: 2px solid black;
+		  border-bottom: 2px solid black;
+		  background: #8DAABA;
+		  position: absolute;
+		  height: 1160px;
+		  overflow: auto;
+		}
+
+		/* Sidebar links */
+		.sidebar a {
+		  display: block;
+		  color: black;
+		  padding: 16px;
+		  text-decoration: none;
+		}
+
+		/* Active/current link */
+		.sidebar a.active {
+		  background-color: #4CAF50;
+		  color: white;
+		}
+
+		/* Links on mouse-over */
+		.sidebar a:hover:not(.active) {
+		  background-color: #555;
+		  color: white;
+		}
+
+		/* Page content. The value of the margin-left property should match the value of the sidebar's width property */
+		div.content {
+		  margin-left: 253px;
+		  height: relative;
+		  border-right: 2px solid black;
+		  border-bottom: 2px solid black;
+		  text-align: center;
+		  background: #8DAABA;
+		  padding: 10px;
+		  font-size: 32px;
+		  
+		}
+
+		/* On screens that are less than 700px wide, make the sidebar into a topbar */
+		@media screen and (max-width: 700px) {
+		  .sidebar {
+			width: 100%;
+			height: auto;
+			position: relative;
+		  }
+		  .sidebar a {float: left;}
+		  div.content {margin-left: 0;}
+		}
+
+		/* On screens that are less than 400px, display the bar vertically, instead of horizontally */
+		@media screen and (max-width: 400px) {
+		  .sidebar a {
+			text-align: center;
+			float: none;
+		  }
+		}
+		
+		/* Style the navigation bar */
+		.navbar {
+		  width: relative;
+		  background-color: #555;
+		  border-left: 2px solid black;
+		  border-right: 2px solid black;
+		  border-bottom: 2px solid black;
+		  overflow: auto;
+		}
+
+		/* Navbar links */
+		.navbar a {
+		  float: left;
+		  text-align: center;
+		  padding: 12px;
+		  color: white;
+		  text-decoration: none;
+		  font-size: 17px;
+		}
+
+		/* Navbar links on mouse-over */
+		.navbar a:hover {
+		  background-color: #000;
+		}
+
+		/* Current/active navbar link */
+		.active {
+		  background-color: #F74356;
+		}
+
+		/* Add responsiveness - will automatically display the navbar vertically instead of horizontally on screens less than 500 pixels */
+		@media screen and (max-width: 500px) {
+		  .navbar a {
+			float: none;
+			display: block;
+		  }
+		}
+		
+		.boxed {
+		  padding: 10px;
+		  background-color: #8DAABA;
+		}
+		
+		table {
+		  margin: auto;
+		  border-collapse: collapse;
+		  border-spacing: 0;
+		  width: 500px;
+		  border: 1px solid #000;
+		}
+
+		th, td {
+		  text-align: center;
+		  padding: 16px;
+		  color: white;
+		}
+
+		tr:nth-child(even) {
+		  background-color: #F74356;
+		}
+		tr:nth-child(odd) {
+		  background-color: #555;
+		}
+		
+		.button {
+		  border-radius: 4px;
+		  background-color: #F74356;
+		  border: none;
+		  color: #FFFFFF;
+		  text-align: center;
+		  font-size: 24px;
+		  padding: 15px;
+		  width: 230px;
+		  transition: all 0.5s;
+		  cursor: pointer;
+		  margin-right: 2px;
+		  margin-bottom: 5px;
+		}
+
+		.button span {
+		  cursor: pointer;
+		  display: inline-block;
+		  position: relative;
+		  transition: 0.5s;
+		}
+
+		.button span:after {
+		  content: '\00bb';
+		  position: absolute;
+		  opacity: 0;
+		  top: 0;
+		  right: -20px;
+		  transition: 0.5s;
+		}
+
+		.button:hover span {
+		  padding-right: 25px;
+		}
+
+		.button:hover span:after {
+		  opacity: 1;
+		  right: 0;
+		}
+		
+		hr.rounded {
+		  border-top: 8px solid black;
+		  border-radius: 5px;
+		}
+
+		
+	</style>
+</head>
+
+{% block content %}
+<div class="header">
+  <h2>DB-Backed Web Application</h2>
+  <p>Made By Ryan Bell & Paul Schmid</p>
+</div>
+
+<div class="navbar">
+	<a href="{% url 'login' %}"><i class="fa fa-fw fa-home"></i> Home</a>
+	<a class="active" href="http://localhost:8000/"><i class="fa fa-fw fa-envelope"></i> Functions</a>
+	<a href="http://localhost:8000/admin" style="float:right"><i class="fa fa-fw fa-user"></i> Administrator Portal</a>
+</div>
+
+<!-- The sidebar -->
+<div class="sidebar">
+	<div class="boxed">
+		{% if user.is_authenticated %}
+		<h3>Logged in: {{ user.username }}</h3>
+		<p><button class="button" onclick="window.location.href = '{% url 'logout' %}';">Logout</button></p>
+		{% else %}
+		<h2>You are not logged in</h2>
+		<button class="button" onclick="window.location.href = '{% url 'login' %}';">Login Page</button>
+		{% endif %}
+	</div>
+</div>
+
+<!-- Page content -->
+<div class="content">
+	{% if user.is_authenticated %}
+	
+	<!-- ADMIN -->
+	{% if user.username == 'admin' %}
+	<h1>Admin Page</h1>
+	<h2>Please select a function below</h2>
+	<hr class="rounded">
+	<h2>F1: List of professors sorted by:</h2>
+	<ul>
+		<button class="button" onclick="window.location.href = '../F1/?sorted=name';"><span>Name </span></button>
+		<button class="button" onclick="window.location.href = '../F1/?sorted=dept';"><span>Department </span></button>
+		<button class="button" onclick="window.location.href = '../F1/?sorted=salary';"><span>Salary </span></button>
+	</ul>
+	<hr class="rounded">
+	<h2>F2: List of minimum, maximum, and average salaries by department:</h2>
+	<ul>
+		<button class="button" onclick="window.location.href = '../F2/';"><span>See list </span></button>
+	</ul>
+	<hr class="rounded">
+	<h2>F3: List of professor's name, department, and total number of students the professor taught in given semester:</h2>
+	<ul>
+		<button class="button" onclick="window.location.href = '../F3/?semester=1';"><span>Fall Semester </span></button>
+		<button class="button" onclick="window.location.href = '../F3/?semester=2';"><span>Spring Semester </span></button>
+	</ul>
+	{% endif %}
+	
+	<!-- PROFESSOR -->
+	{% if user.username == 'professor' %}
+	<h1>Professor Page</h1>
+	<h2>Please select a function below</h2>
+	<hr class="rounded">
+	<h2>F4: List of course sections and number of students enrolled in each section for a given semester:</h2>
+	<form action="../F4/" method="get">
+		Select a professor:
+		<select id="professors" name="name" style="width: 200px; height: 40px">
+			<option value="0">Select professor:</option>
+			{% for i in data%}
+			<option value="{{i.name}}">{{i.name}}</option>
+			{% endfor %}
+		</select>
+		<p>Select a semester:
+		<input type="radio" id="1" name="semester" value="1">
+	    <label for="fall">Fall</label>
+	    <input type="radio" id="2" name="semester" value="2">
+	    <label for="spring">Spring</label>
+		</p>
+		<input type="submit" class='button' value="Submit">
+	</form>
+	<hr class="rounded">
+	<h2>F5: List of students enrolled in a course section taught by this professor for a given semester:</h2>
+	<form action="../F5/" method="get">
+		Select a professor:
+		<select id="professors" name="name" style="width: 200px; height: 40px">
+			<option value="0">Select professor:</option>
+			{% for i in data%}
+			<option value="{{i.name}}">{{i.name}}</option>
+			{% endfor %}
+		</select>
+		<p>Select a semester:
+		<input type="radio" id="1" name="semester" value="1">
+	    <label for="fall">Fall</label>
+	    <input type="radio" id="2" name="semester" value="2">
+	    <label for="spring">Spring</label>
+		</p>
+		<input type="submit" class='button' value="Submit">
+	</form>
+	{% endif %}
+	
+	<!-- STUDENT -->
+	{% if user.username == 'student' %}
+	<h1>Student Page</h1>
+	<h2>Please select a function below</h2>
+	<hr class="rounded">
+	<h2>F6: List of course sections offered by a dept in a given semester and year:</h2>
+	<form action="../F6/" method="get">
+		Select a semester:
+		<input type="radio" id="1" name="semester" value="1">
+	    <label for="male">Fall</label>
+	    <input type="radio" id="2" name="semester" value="2">
+	    <label for="female">Spring</label><br>
+		Select a year:
+		<select id="years" name="year" style="margin: 10px; width: 100px; height: 40px">
+			<option value="0">Select year:</option>
+			<option value="2016">2016</option>
+			<option value="2017">2017</option>
+			<option value="2018">2018</option>
+			<option value="2019">2019</option>
+			<option value="2020">2020</option>
+		</select><br>
+		<input type="submit" class='button' value="Submit">
+	</form>
+	{% endif %}
+	{% else %}
+	<h1>Please login to see functions</h1>
+	<button class="button" onclick="window.location.href = '{% url 'login' %}';">Login Page</button>
+	{% endif %}
+</div>
+{% endblock %}

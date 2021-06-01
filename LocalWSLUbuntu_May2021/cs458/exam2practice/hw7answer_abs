@@ -1,0 +1,22 @@
+//lynch code
+method abs(A: array<int>, size: nat)
+requires size<=A.Length
+modifies A
+ensures forall ix : 0 <= ix < size ==> A[ix] >= 0
+ensures forall ix : 0 <= ix < size ==> A[ix] == old(A[ix]) || A[ix] == -old(A[ix])
+{
+  var i := 0;
+	while i < size
+	invariant 0 <= i <= size
+	invariant forall ix : 0 <= ix < i ==> A[ix] >= 0
+	invariant forall ix : 0 <= ix < i ==> A[ix] == old(A[ix]) || A[ix] == -old(A[ix])
+	invariant forall ix : i <= ix < size ==> A[ix] == old(A[ix])
+	//decreases size - i <- didnt use but isn't wrong
+	{
+		if (A[i] < 0) 
+    {
+			A[i] := -A[i];
+		}
+    i := i + 1;
+	}
+}

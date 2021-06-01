@@ -1,0 +1,1449 @@
+Midterm 2 notes
+
+during class time wednsday
+similar number of questions as exam 1, both multiple choice and written
+extra 30 minutes on top of class times
+open notes and open book
+
+FINAL NOT IN PERSON, WILL PROBABLY BE ON MOODLE!!!
+
+topics covered
+slides 11-16
+
+---------------------------------------------------------------------------------------------------
+---- Notes ----------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
+
+-- Slide Set 11 -- Memory Management --------------------------------------------------------------
+
+    Compilers
+        - Compliers take human readable high level code and produce executable ones
+        - OS executes the executables as processes
+        - Compliers know what architecture the OS being compiled for needs
+            + Architecture -> instruction set, registers, etc.
+            + OS -> exectuable format like PE, ELF, or COFF (e.g. where to put main, global variables, eyc.)
+
+
+    Address Space Map:
+        Biggest ^  +----------------------------------------+ <--- Sometimes reserved for OS
+        Virtual |  | Stack - Space for local variables etc. |
+        Address |  |         For each nested procedure call |
+                |  +----------------------------------------+ <--- Stack Pointer
+                |  |       |                  ^             | <--- Biggest area
+                |  |       V                  |             |      OS will typically stop you long before the stack and heap overlap but it can be changed  
+                |  +----------------------------------------+
+                |  | Heap - Space for dynamically allocated |
+                |  | memory (e.g. with malloc)              |
+                |  +----------------------------------------+
+                |  | Staticly Decalre Variables             |
+                |  | (Global Variables)                     |
+                |  +----------------------------------------+
+                |  | The Code                               | <--- PC
+                |  | Text segment                           |
+        0x0000  V  +----------------------------------------+ <--- Sometimes reserved for Error Catching
+
+    In a 32 bit machine, each process gets 2^32 bits of space to use (4 Gb), 
+    does each process really need all this space in memory at all times?
+        - First, has it used it all?
+            + lots of toom in the middle between heap and stack
+        - Second, even it has if it has used a chunk of the adress space, is it using it actively right now?
+            + Maybe lots of code that is rarely used (initilazation code used only at the beginning, error handling code, etc.)
+            + Allocate space on the heap then de-allocate
+            + Stack grows big once but then normally stays small
+        - What to do with portions of address space never used?
+            + Dont allocate until touched
+        - What to do with rarely used portions of the address space?
+            + Just because its rarely used doesnt mean its not necessary to store
+                * Still a shame to waste that space, what to do
+            + Why not send it to disk to get it out of our way?
+                * disk not being used as non-volitile memory but more as a staging area
+                * can help restore running processes after a crash
+                * NEED TO REMEMBER WHERE IT WAS WRITTEN TO IN ORDER TO READ IT AGAIN!!!
+
+    Logistics:
+        - How to keep track of which regions are paged and where they are?
+        - what will happen when a process tries to access a paged region on disk?   
+        - How will DRAM and disk be shred with the File System?
+        - Will we have a minimum size region that can be sent to disk?
+            * A fixed block or page is useful to reduce fragmentation and for efficent disk access
+        
+    Virtual Memory:
+        - Basic OS memory management abstraction/technique
+        - processes use virtual addresses
+            + every time a process fetches an instruction or loads a value into a register it refers to virtual memory address
+        - OS (with help from the hardware) translates virtual addresses to physical addresses
+            + must be fast as its always happeneing
+            + OS guides the hardware on how to do this translation to avoid system call overhead
+            + OS only takes control when hardware cant translate something
+        - OS manages sending some portions of virtual address space to disk when necessary
+            + Called paging
+            + Sometimes translation will involve stalling to fetch page from disk
+        - Provides protection and isolation among processes 
+            + Processes can only use virtual memory addresses rather than the real ones
+              Only the OS can interact with physical memory
+              This prevents processes from being able to access other processes memory by accident
+        - Provides illusion of more available system memory
+            + OS tries to share its memory fairly among processes
+                * "Your whole set of addresses is avalible and if you need them then the OS will bring them from disk to you"
+            + Illusion breaks with heavy paging and out of memory errors
+                * Out of memory error start before hitting maximum space used to prevent massive issues
+
+            + Can one processes use so much memory taht other processes are forced to page heavily?
+            + Can one processes use so much of the backing storage that other processes get out of memory errors?
+        - Hardware support for virtual memory
+            + Fast translations require hardware support, without it the OS would have to be invloved on every instruction execution
+            + OS initilizes harware properly on context switch and then hardware supplies translation protection
+        
+    Simple Verion: Fixed Partitions:
+        - OS can divide physical memory into fixed sized regions that are available to hold portions of the address spaces of processes
+        - Each process gets a partition and so the number of partitions = the max number of runnable processses
+        - Harware Support
+            + Base registers
+            + Physical address = Virtual address + base register
+            + If Physical address > partitionsize then harware generates a faults
+        - During context switch, OS will set the base register to the beginning of the new processes partition
+        - Hardware could have another register that says the base virtual address in the partition
+        - Translation/protection would then be
+            + If virtual address generated by the process is between the base virtual address and base virtual address + length, 
+              then access is ok and physical address is Virtual address - base virtual address Register + base register
+            + Otherwise OS must write out the current contents of the partition and read the section of the address space being addressed now
+            + OS must record location on disk where all non resident regions are written 
+              (or record that no space has been allocated on disk or in memory if a region has never been accessed)
+        - Problems with fixed size partitions
+            + Must access contiguous portion of address space
+                * Using both code and stack could mean a lot of paging
+            + What is the best fixed size?
+                * If everything a process needs is in the parition, it might need to get very big
+                  (or at least need to cahnge how compilers work)
+            + Paging such a big thing could take a long time
+              (Especially if only using a small portion)
+            + Also "best" size would vary by process
+                * Some processes might not need all the "fixed" size while others need more than it
+                * Internal fragmentation 
+                  (Wasted space inside a block)
+
+    Technique 2: Variable size partitions:
+        - Very similar to fixed size partitions
+        - Add a length register (no longer a fixed size) that hardware uses in translation/protection calculations 
+          and that OS saves/ restores on context switch
+        - No longer have a problem with internal fragmentation
+        - May have external fragmentation
+            + As processes are created and completed, free space in memory is likely to be divided into smaller pieces 
+            + Could relocate processes to coalesce the free space
+        - How does OS know how big to make wach process partition? Also how big does OS decide what is a fair amount to give each process?
+        - Still have problem of only using only contigous regions
+
+    Paging:
+        - Could solve the external fragmentation problem, minimize the internal fragmentaion problem 
+          and allow non-contigous regions of address space to be resident by breaking both physcial and virtual memory up into fixed size units
+            + Smaller than a partition but big enough to make a read/write disk efficent often 4k/8k
+            + often match FS - why?
+        - How to find pages?
+            + Any page of physical memory can hold any page of virtual memory from any process
+                * How long are we going to keep track of this?
+                * How are we going to do translation?
+            + Need to map virtual memory pages to physical memory pages (or use disk locations or that no space is yet allocated)
+            + Such maps are called page tables
+                * One for each process (Virtual address x will map differently to physical pages for different processes)
+
+    Page Table Entry:
+        - Each entry on a page table maps virtual page numbers to (VPNs) to physcial page frame numbers (PFNs)
+            + Virtual addresses have 2 parts: VPN and offset
+            + Physical addresses have 2 parts: PFN and offset   
+            + Offset stays the same is virtual and physical pages are the same size   
+            + Are VPN and PFN the same size
+        - Take a full virtual address and a full physical address and spit them into peices, a lower and upper portion
+            + lower portion whould be the same size
+            + Upper part returns a page number and lower part returns an offset
+
+    
+    +---- Translation --------------------------------------------------------------------+
+    |                                                                                     |
+    |    Virtual Address                                                                  |
+    |    [[Virtual Page #][Offset]]                                                       |
+    |         |                                                       [Page Frame 0]      |
+    |   (translation)                                                 [Page Frame 1]      |
+    |         |                                                                           |
+    |         |   Page Table                                                              |
+    |         |   [            ]                                                          |
+    |         |   [            ]       Physcial address                                   |
+    |         +-> [Page Frame #] ----> [[Page Frame #][Offset]] ----> [Needed Page Frame] |
+    |             [            ]            |                             ^               |
+    |             [            ]            |                             |               |
+    |                                       + ----------------------------+               |
+    |                                                                                     |
+    |                                                                 [Page Frame n]      |
+    |                                                                                     |
+    +-------------------------------------------------------------------------------------+
+
+    Example:
+        - Assume a 32 bit address space and 4k page size
+            + 32 bit address space implies virtual address have 32 bits and full address space is 4 Gb
+            + 4k page length means offset is 12 bits (2^12 = 4k)
+            + 32-12 = 20 so VPN is 20 bits
+            + How many bits is PFN? Often 20 bits as well but wouldn't have to be 
+              (enough to just cover virtual memory)
+        - Suppose Virtual address 
+          00000000000000011000|000000000111 or 0x18007
+            + Offset is 0x7, VPN is 0x18
+            + Suppose page table says VPN 0x18 translates to PFN 0x148 or 101001000
+        - Physical address is 
+          00000000000101001000|000000000111 or 0x148007
+
+    +---- Example in Picture Form --------------------------------------------------------------------------+
+    |                                                                                                       |
+    |    Virtual Address - 0x18007                                                                          |
+    |    [[00000000000000011000][000000000111]]                                                             |
+    |         |                                                                             [Page Frame 0]  |
+    |   (translation)                                                                       [Page Frame 1]  |
+    |         |                                                                                             |
+    |         |   Page Table                                                                                |
+    |         |   [                    ]                                                                    |
+    |         |   [                    ]       Physcial address - 0x148007                                  |
+    |         +-> [00000000000101001000] ----> [[00000000000101001000][000000000111]] ----> [Page 0x148007] |
+    |             [                    ]                    |                                   ^           |
+    |             [                    ]                    |                                   |           |
+    |                                                       + ----------------------------------+           |
+    |                                                                                                       |
+    |                                                                                       [Page Frame n]  |
+    |                                                                                                       |
+    +-------------------------------------------------------------------------------------------------------+
+        
+    Page Table Entries Revisited:
+        - Entry can and does contain more than just a page frame number
+                [[M][R][V][prot][           Page Frame Number           ]]
+        - [M]odify bit: whether or not the page is dirty
+            + Whether the copy in physical memory matches the version on disk
+            + Birty pages cant be removed from physical memory without investing in a disk write to safely access later
+        - [R]eferance bit: whether or not the page has been read/written recently
+        - [V]alid bit: whether the page table entry contains a valid translation
+        - [prot]ection bits: which operations are valid on this page
+            * read
+            * write
+            * execute
+        - Page Frame Number
+
+    Processes' View of Paging:
+        - Processes view memory as a contigous address space from 0 through n
+            + OS may reserve some of the address sapace for its own use 
+              (map OS into all processes address space is a certain range or declare some addressess invalid)
+        - In reality, virtual pages are scattered across physical memory frames (and possibly paged out to disk)
+            + Mapping is invisible to the program and beyond its control
+        - Programs cannot referance memory outside its virtual address space because virtual address X will map 
+          to different physical addresss for different processes
+
+    Paging Advantages:
+        - Avoid external fragmentation
+            + Any phsyical page can be used for any virtual page
+            + OS maintains list of free physical frames
+        - Minimize internal fragmentaion (pages ar emuch smaller than partitions)
+        - Easy to send pages to disk
+            + Dont need to send a huge region at once
+            + Use a valid bit to detect referance to paged out regions
+        - Can have non-contigious regions of the address space resident in memory
+    
+    Paging Disadvantages:
+        - Memory to hold page tables can be large
+            + one PTE per virtual page
+            + 32 bit address space with 4KB pages and 4 bytes/PTE = 4 MB of page table per process!!!
+            + 25 processes = 100 MB of page tables!!!
+            + Can we reduce this size?
+                * Play same trick we did with address space - why have a PTE for virtual pages never touched?
+                    ~ Add a level of indirection
+                    ~ Two level page tables
+        - Memory referance overhead
+            + Memory referance means 1 memory accesss for the page table entry, doing the translation, 
+              then 1 memory acess for the actual meory access
+            + Caching translations
+        - Still some internal fragmentaion
+            + Process may not be use using memory in exact multiples of page size
+            + Pages big enough to amortize disk latency
+        
+    Two Level Page Table: (Can have more in the real world i.e. n level page tables)
+        - Add a level of indirection
+        - Virtual addresses not have 3 parts: Master page number, secondary page number, and offset
+        - Virtual Address
+            [[        Virtual Page #         ][Offset]]
+            [[Master Page #][Secondary Page #][Offset]]
+        - Make master page table fit in one page
+            + 4K page = 1024 4 byte patterns
+            + So 1024 secondary page tables = 10 bits for master, still 12 for offset so 10 left for secondary
+        - Invalid MPTE means whole chunk of address space not there
+    
+    +---- Two Level Translation --------------------------------------------------------------------------+
+    |                                                                                                     |    
+    |    Virtual Address                                                                                  |
+    |    [[Master Page #][Secondary Page #][Offset]]---------------------------------------------+        |
+    |         |              |                                                                   |        |
+    |   (translation)        +---------------+                                                   |        |
+    |         |      Master Page Table       |                                                   |        |
+    |         |      [                    ]  |                                                   |        |
+    |         |      [                    ]  |                                                   |        |
+    |         +----> [Secondary Page Table] -+--> Secondary Page Table                           |        |
+    |                [                    ]  |    [                  ]        Physical Address   V        |
+    |                [                    ]  +--> [Page Frame #      ] -----> [[Page Frame #][Offset]]    |
+    |                                             [                  ]                                    |
+    |                                                                                                     |
+    +-----------------------------------------------------------------------------------------------------+
+
+    Page the Page Tables:
+        - In addition to allowing MPTE's to say invalid could also say this secondary page table on disk
+        - Master PTE for each process must stay in memory
+            + Or maybe add another level of indirection?
+            + Table mapping Master PTEs for each process to DRAM location of disk LBA
+        - Each layer of indirection adds to access cost
+        - Original page table scheme doubled the cost of memory access (one for page table, one for real memory location)
+        - Two level triples the cost
+        - Solve problem with caching
+
+    Translation Lookaside Buffer (TLB):
+        - Adds a hardware cache inside the CPU to store recent virtual page to page table Entries
+            + Fast, one machine cycle for a hitting
+        - OS doesnt even have to get involved when hit in the TLB
+        - Usually a fully associative cache
+        - Cache tags are virtual page numbers
+            + Fast, all entries are seached/compared in parallel
+            + Small, usually onl 16-48 entries (64-192 KB)
+                * If process actively using more address space than that, it will get TLB misses
+            + In harware, small often equals fast
+        - Cache values are PTEs
+        - TBL is managed by the memory management unit (MMU)
+            + With PTE + offset, MMU can directly calculate the physical address
+        - Manages to get >99% hits
+        - Processes have very high degree of locality to their accesses patterns
+            + When map a 4k page, likely access one memory location, that prefetched the rest
+              and likely to access them next (so if 1 in 1042 4 byte accesses will be hits)
+
+    What happens when a TLB Misses?
+        - Hardware loaded TLBs
+            + HArware knows where page tables are in memory (stored in register say)
+            + Tables must be in HW defined format so that it can parse them
+            + X86 works this way
+        - Software loaded TLB
+            + On TLB miss generate on OS fault and OS must find and load the correct PTE and then restart the access
+            + OS can define PTE foramt as long as loads in foramt HW wants into the TLB
+        - Either way, we have to choose one of current entries to kick out - which one?
+            + TLB replacement policy usually as simple LRU
+
+    Context Switch:
+        - Contents of TLb reflect mapping from virtual to physical - that only applies to only one process
+        - On context switch must flush the current TLB entries of things from last process
+        - Could restore entries for new process (preload) or just set them all to invalid 
+          and generate faults for first few accesses
+        - This is a big reason context switches are expensive!
+            + recall kernal level thread switch more expensive than user level switch
+
+    Segmentaion:
+        - Similar technique to paging except partition address space into variable sized segments reather than into fixed sized pages
+            + Recall FS blocks vs extends
+            + Variable size = more external fragmentaion
+        - Segments usually correspond to logical units
+            + code segment, heap segment, stack segment, etc.
+        - Virtual address = [[Segment #][Offset]]
+        - HW support? Often multiple base/limit register pairs, one per segment
+            + stored in segment table
+            + segment # used as index into the table
+
+    Paging Segments?
+        - Use segments to manage logical units and then divide them into fixed size pages
+            + no external fragmentation
+            + Segments are pageable so dont need whole segment in memory at time
+        - X86 does this
+    
+    Linux on X86:
+        - 1 kernal code segment and 1 kernal data segment
+        - 1 user code segment and 1 user data segment
+        - Belongs to process currently running
+        - N task segments (stores registers on context switch)
+        - All segments paged with 3 page tables
+
+    Shared Memory:
+        - Like building a wall between processes and then opening a door between some
+            + Creates a virtual address space and allows both processes to read and write to it
+            + A way to implement process communication
+        - Exploit level of indirection between virtual address 
+          and physical address to allow processes to communicate through shared memory
+        - Map the same set of physical page frames into different virtual address space 
+          (maybe at a different virtual addresses)
+            + Each process has its own PTEs so it can give different processes different types of access
+              (read/write/execute)
+            + Execute access to same regions good for shared libraries
+
+    Duplicates of large items:
+        - Suppose two processes each want a private writable copy of the same data
+            + Like fork splitting into 2 copies
+                * copy-on-write
+        - If it is small give them there own physical pages
+        - They just want private writable copies so can't just use normal shared memory
+        - If it is big painful to duplicate especially if they are each going to change a little bit
+
+    Copy-on-Write:
+        - Instead of copying, make a shared memory region but mark everyone's permissions as read only 
+          (even though they really have permission to write)
+        - Then if they try to write, HW will generate an access violation fault
+            + OS invoked on faults and usually end processes
+            + In this case, OS will make a copy of just the page written and then set the PTE to point to 
+              the new private copy (with write privalages this time) and restart
+            + Much like servicing a page fault where have to bring data in from disk
+        - Copy-on-Write often used on fork to share a copy of the parents address space even though logically 
+          parent and child each get their own provate writable copy (esp good because often wuickly overwritten)
+
+    Memory Mapped Files:
+        - Can access files thorugh the virtual memory system as well as through typical open/read/write FS interface
+        - Map a file into a region of your address space
+            + File start = address x
+            + Then read file offset y = look at your data a memory location x+y
+            + Write File offsetr y = set memory location x+y = new value
+        - Doesn't read entire file when Mapped
+            + Initally pages mapped to the file are invalid
+            + When the memory mapped region. translated into FS read/write operations by the OS
+
+
+-- Slide Set 12 -- Memory Management 2: Memory Boogaloo -------------------------------------------
+
+    Overview
+    Demand paging
+        Start with no physical memory pages mapped and load them in on demand
+    Page replacement Algorithms
+        Belady – optimal but unrealizable
+        FIFO – replace page loaded earliest
+        LRU – replace page referenced earliest
+        Working Set – keep set of pages in memory that induces minimal fault rate (need program specification)
+        PFF – Grow/shrink page set as a function of fault rate
+    Fairness – globally optimal replacement vs protecting processes from each other?
+
+
+    Limited DRAM:
+        - With paging we could probably "function" with just one resident memory page for each process
+          (and its master page table)
+        - But reading and writing memory pages to disk is expensive so we dont want to do it very often
+        - So how much system DRAM do we really need for each process?
+            + Do we give each process the same amount of memory?
+            + Do they all need the same amount?
+            + Do we have enough system DRAM to support all the processes we want to run? 
+              (We know we can do better than 4 BG for each one but to avoid constant paging how many do we need?)
+                * practical and theoretical answer
+
+    Practical answer:
+        - SIZE refers to virtual memory, RES refers to physical memory (In linux - page 3 of slides)
+        - SIZE - RES is amount of non-volitile storage needed
+            + using this to be bigger and cheaper than volitile memory not necessarily to be non-volitile
+        - Can store to volitile storage with free space in memory if data is not being used
+        - Observations about actual memory usage
+            + Varies signifcantly per process
+            + Are any processes paging too hevily?
+                * could we tell from just the stats? how would we know?
+
+    Theoretical answer:
+        - How much memory do processes need?
+        - "working set" of a processes is the set of virtual memory pages being actively used by the process
+        - Define a working set over an interval
+            + W Sp(w)= pages P accesses in the last w accesses
+            + if w = total number of P accesses P makes then WSp(w) = every virtual meory page touched by P
+        - Small working set = accesses of a process have high degree of locality
+        - Changes in working Set
+            + working set changes over the life of the processes
+                * e.g. At first all the initalizization code is in the working set of a process but after 
+                  some time it wont be any longer
+            + Intuitively, you need to keep the working set of a processes in memory or the OS will constantly 
+              be bringing pages on and off disk
+            + Normally when we ask how much memory a given programs needs to run, 
+              the answer is either its average or maximum working set (depending on how conservative you want to make your estimate)
+            
+    Demand paging
+        - When a process first starts up
+            + It has a brand new page table with all PTE valid bits set to false because no pages yet mapped to mysical memory
+            + As processes fetches instructions and accesses data, there will be page faults for each page touched
+            + Only pages that are needed or "demanded" by the processes will be brought in from disk
+        - Eventually mat bring so many pages in that must choose some for eviction
+            + Once evicted, if access, will once again demand page in from disk
+        - When working set cahnges (like at the beginning of a process), you will get disk I/Object
+        - But if most memory eccesses result in disk I/O the process will run *painfully* slow
+        - Virtual memory may be invisible from a functional standpoint but certainly not from a performance one
+            + There is a performance cliff and if you step off of it you are going to know
+            + remember building systems with cliffs is not good
+
+    Pre-paging:
+        - Anticipating fault before it happens and prefetch the data
+        - Overlap fetch with computation
+        - Can be hard to predict and if predicted wrong evict something useful in excange
+        - Programmers can give hints (vm_advise)
+
+    Thrashing:
+        - Spending all your time moving between pages and from disk and little time actually maknig progress
+        - System is overcommited
+
+    Avoid paging:
+        - Given the cost of paging, we want to make it infrequent as possible
+        - Fucntion of:
+            + Degree of locality in the application (size of the working set over time)
+            + Amount of physical memory
+            + Page replacement processes
+        - The OS can only control the replacement policy
+
+    Goals of Replacement Policy:
+        - Performance
+            + Eveict a page that will never be accessed again if possible
+            + If not possible, evict a page that wont be used for the longest time
+            + How can we proedict this?
+        - Fairness
+            + When the OS divides up the available memory among processes, what is a fair way to do that?
+                * Same amount to everyone? Well some processes may not need that for their working set 
+                  and some may be paging to disk constantly with that amount of memory
+                * Give each processes its working set?
+            + As long as enough memory for each process to have its working set resident then everyone is happy
+                * if not how do we resolve the conflict?
+        - Algorithms
+            + Remember all the different CPU sceduling algorithms the OS could use to choose the next job to run
+            + Similarly, there are many different algorithms for picking which page to kick out when you have to 
+              bring in a new page and there is no free DRAM left
+            + Goal?
+                * Reduce the overall system page fault rate?
+                * Balance page fault rates among processes?
+                * Minimize page faults for high priority jobs?
+
+    Beleday's Algorithm:
+        - Evict page that wont be used again for the longest time
+            * Cant know this 100% for sure
+        - Much like shortest jobs first
+        - Has provably optimal lowest page fault rate
+        - Difficult to predict which page won't be used for a while
+            + Even if not practical can use it to compare other algorithms too
+
+    First-In-First-Out (FIFO):
+        - Evict the page that was inserted the longest time algorithms
+            + When page put on tail of list
+            + Evict head of list
+        - Is always (usually) the case that the thing accessed the longest time ago will not be accessed for a long time
+        - What about things accessed all the time?
+        - FIFO suffers an interesting anomaly (Beleday's anomaly)
+            + It is possible to increase the page fault rate by increasing the amount of memory
+
+    Least-Recently Used (LRU):
+        - Idea: the past is a good predictor of the future of the future
+            + Page that we haven't used for the longest time likely not to be used again for longest time
+            + Is past a good predictor
+                * Generally yields
+                * could be exactly the wrong thing! Consider streaming access
+        - To do this requires keeping a history of past accesses
+            + To be exact LRU would need to save a timestamp on each access (i.e. write the PTE on each access!)
+            + Too expensive
+
+    LRU Clock:
+        - Also called Second Chance
+        - Logically put on all physical page frames in a circle (clock)
+        - Maintain a pointer to a current page
+            + If ref bit off then evict
+            + If ref bit on clear and move on (second chance)
+        - Arm moves as wuickly as evictions are requested
+        - If evictions rarely requested then arm moves slowly and pages have a long time to be referanced
+        - If evictions frequently requested then arm moves fast and little time before the second cahnce is up
+
+    Fairness?
+        - All the replacment policies weve looked at so far just try to pick the page to evict regardless 
+          of which which process the page belongs to
+        - What if demand page in from one process causes the eviction of another processes page? Is that fair?
+        - On the other hand is it fair for one processes to have 2 times their working set 
+          while another has 1/2 their working set and is paging heavily?
+
+    Fixed vs Variable Space:
+        - Fixed Space algorithms
+            + Give each process a limit of pages it can use
+            + When it reaches its limit, it replaces LRU or FIFO or whatever from its pages
+            + May be more natural to give process a say in the replacement policy used for its pages
+        - Variable space algorithms
+            + Processes set of pages grow and shrinks
+            + One processes can ruin it for the rest but opportunity to make globally better decisions
+
+    Use Working Set:
+        - Could ask each process to inform the OS of the size of its working set
+        - OS can only allow a process to start is it can allocate the complete working set
+        - How easy for processes to report this?
+
+    Page Fault Frequency:
+        - PFF is a variable-space algorithm that tries to determine the wokring set size dynamically
+        - Monitor pgae fault rtae for each process
+        - If fault rate is above a given threshold, take away memory
+        - Constant adjustment? Dampening factor so only changes occasionally
+
+    Best Page Replacement:
+        - It depends
+        - Interestingly, if you have too much memory it doesnt matter
+            + Anything will be ok (overprovisoning)
+        - Also dosen't matter if you have too little memory
+            + Thrashing and nothing you can do to stop it (overcommited)
+
+
+-- Slide Set 13 -- Storage ------------------------------------------------------------------------
+
+    Storage Hierarchy:
+                 _________  Faster, Smaller, more expensive
+                /Registers\            ^
+               / L1 Cache  \            \  
+              /  L2 Cache   \            \
+             /   DRAM        \   Volitile \
+        ----/-----------------\--------------
+           /     NVRAM         \ Non-volitile
+          /      DISK           \
+         /       TAPE            \ (removable backup drives)
+        +-------------------------+
+
+    Example:
+               ______      Faster, Smaller
+              /Mind  \            ^
+             / Pocket \            \  
+            /  Backpack\            \
+           /   Desk     \            \
+          /    Bookshelf \ 
+         /     The Attic  \
+        +------------------+
+
+    Secondary Storage:
+        - "Secondary becuase unlike primary memory does not permit direct execution of instructions or data retrival via load/store instructions
+        - Usually means hard disks
+        - Tends to be larger cheaper and slower than primary memory
+        - Persistant/non-volitile
+
+    Tertiary Storage Devices:
+        - Used primaraly as backup and archival storage
+        - Low Cost is the defining characteristic
+        - Often consists of removable media
+            + CD-ROMS, tapes, etc.
+        - As disks get cheaper and cheaper, duplicating data on multiple disks becomes 
+          more and more attractive as a backup strategy
+
+    Disk Basics:
+        - Disk Drives contain metallic platters spinning around a central spindle                     
+        - Read/Write head assembly is mounted on an arm that moves across the surface of the platters
+        - Track: One ring around the surface of one of the platters
+        - Sector: one peice of track (usually 512 bytes); more sectors in outer tracks
+        - Cylinder: all tracks at the same distance from the center of the platters
+          (i.e. all tracks readable without moving the disk arm)
+    
+    Disk Addressing:
+        - Early Disks were addressed with a cylinder # surface # and sector #
+        - Today disks hide information about their geometry
+            + Disks export a logical array block
+            + Disk itself maps from logical block addresses (LBA) to cylinder/surface/sector
+            + Allows disk to remap bad sectors (when formatted disk reserves some sectors to use as replacements)
+            + Allows disks to hide the non-uniformity of the storage
+                * More Data on outer tracks
+        - Disks also have internal caches so that not all requests go to the media
+            + On reads take advanteage of multiple accesses to the same track
+            + On Writes, say write is "done" when it is memory (not storage) inside the disk
+
+    Disk Foramtting:
+        - Low-level foramtting invloves dividing the magnetic media into sectors
+            + Each sector actually consists of a header, data, and a trailer
+            + Header and trailer cintain information like secotr number and error correcting codes (ECC)
+            + ECC is additional redundant bits that can often correct for bit errors in the stored value
+            + Help disk head settling (Figure out what platter you are)
+        - OS also formats drives
+            + 1st divides into partitions - each partition can be trated as a logically seperate drives
+            + 2nd file system formatting of partitions (more on that later)
+
+    Disk Interfaces:
+        - Interface to the disk
+            + Request specified with LBA and length
+            + Request placed on bus, later repy placed on bus
+        - Device driver hides these details
+            + Provide abstraction of synchronous disk
+        - OS use the disk to provide services
+            + Virtual Memory
+        - OS exports higher level abstractions
+            + File systems
+        - Some applicaitons use the device driver interface to build abstractions of their own
+          (get their own partition)
+            + Database Systems
+
+    Disk Performance:
+        - Divde the time for an access into stages
+            + Seek time: time to move the disk arm to the corretc cylinder
+                * How fast can mechanical arm move? Improves some with smaller disks but not much
+            + Rotaional delay: time waiting for the correct sector to rotate under the read/write head
+                * How fast can the spindle turn? RPMs go up but slowly
+            + Transfer time: once head is over the right spot how long to transfer all the data
+                * Larger for larger transfers
+                * Rate determined by RPMs and by density of the bits on the disk (Density going up very quickly)
+        - Getting good performance from drive (seeing impact of a "faster" drive means avoid seek and rotational delay)
+
+    Avoid Seek and Rotational Delay:
+        - To take advantage of higher transfer rates, OS must transfer larger and larger chunks of data at a time 
+          and avoid seek and rotational delay
+            + Size and placement of virtual memory pages
+            + Size and placement of FS blocks
+        - OS tries to avoid seek and rotational delay by placing things on disk together that will be accesed together
+        - Can also avoid seek and rotational delay by queuing up multiple disk requests and servicing them in an order 
+          that minimizes head movement (disk scheduling)
+            + Like with CPU scheduling, there are many disk sceduling algorithms
+    
+    First Come First Serve (FCFS):
+        - While fair, it dosent seek to solve seek and rotational delay
+
+    Shortest seek time first (SSTF):
+        - Selects the request with minimum seek time from the current head position
+        - SSTF sceduling is a form of shortest job first (SJF) sceduling; may cause starvation of some requests
+
+    SCAN (elevator sceduling):
+        - The disk arm starts at one end of the disk nad moves toward the toher end, servicing requests until it gets to the otehr end of the disk,
+          where the head movement is reversed and servicing continues.
+    
+    C-SCAN (Circular SCAN):
+        - Provides a more uniform wait time than SCAN (with scan, those in middle wait less)
+        - The head moves from one end of the disk to the other. servicing requests as it goes. When it reaches the other end, however,
+          it immediatley returns to the begining of the disk, without servicing any requests on the return triples
+        - Treats cylinders as circular list that wraps around from the last cylinder to the first one
+
+    C-LOOK:
+        - Version of C-SCAN
+        - Arm only goes as far as the last request in each direction, the reverses direction immediatley, 
+          without first going all the way to the end of the disk
+
+    Selecting a Disk-Scheduling Algorithm:
+        - SSTF is common and has a natural appeal
+            + Starvation not observed to be a problem in practice
+        - SCAN and C-SCAN preform better for systems that place a heavy load on the disk
+        - Performance depends on the number and types of requests
+        - Requests for a disk service can be infuenced by file-allocation method
+        - Wither SSTF or C-LOOK is a reasonable choiice for the default algorithm
+
+    Tracking Technology Trends:
+        - Exact comaprison between technologies changes all the time
+            + how much slower disk is than main memory
+            + Variation even in disks and various memory technologies
+        - Tracking these things takes a fair amount of work
+
+    Non-Volitile Memory (NVRAM):
+        - Memory that keeps it scontents when power removed
+        - Used as secondary storage like disks
+        - RAM = random access memory
+            + DRAM = dynamic random access memory
+            + NVRAM = non-volitile random access memory
+        - Intermediate technology between DRAM and disk
+            + Bigger and cheaper than DRAM
+            + Smaller and more expensive than disk
+        - Advantages
+            + Solid state - no moving parts
+                * AVoids seek and rotational latency of disk - so faster
+                * uses less power than disk
+                * less suceptable to shock from dropping (really good for portable devices)
+        - Not jusy one NVRAM technology
+            + Some of earliest was just battery backed DRAM
+            + EPROM (erasable programmable read-only memory)
+                * Erases with UV light
+                * Erase whole thing to rewrite
+                * Good for wrtie rarely, read mostly
+            + EEPROM (electrically rasable programmable read-only memory)
+                * Erases with higer voltage
+                * Erase whole thing to rewrite
+                * Good for wrtie rarely, read mostly
+
+    Solid State Drives (SSD):
+        - Disk drives made from NVRAM
+        - Block based interface like disk
+            + read/write logical block addresses
+        - 2018: $220/1 Tb SSD and $90/1 Tb hard drive and ~5x faster
+    
+    Flash:
+        - Erase a block at a time rather than all at once
+            + NOR Flash resembles a NOR gate
+                * Each cell has one end connect directly to ground, and the other end connected diretly to a bit line
+                * Common for code starage and execution in cell phones, but NAND becoming popular there too
+            + NAND Flash resembles a NAND gate
+                * Several tranistors are connected in a series, and the bit line is pulled low only if all the word lines are pulled high
+                * More cost effectively support smaller eras blocks comapred to NOR Flash
+                * Common in cameras and SSDs
+            - Flash Comaprison    | NOR  | NAND   |
+              --------------------+------+--------+
+              Cost Per Bit        | High | Low    | 
+              File Storage Useage | Hard | Easy   |
+              Code Execution      | Easy | Hard   |
+              Capacity            | Low  | High   |
+              Write Speed         | Low  | High   |
+              Read Speed          | High | Lower  |
+              Active Power        | High | Low    |
+              Standby Power       | Low  | Higher |
+              **Note: Higher and lower mean slightly higher or lower not a lot**
+
+    HDD: Hard Disk Drives
+    SSD: Solid State Drives
+    SSHD: Solid-State Hard Drive
+        - Regular HDD with an aditional NAND cache for storing more frequently used data and loading that data more quickly
+    
+    OS adapts to performance trends?
+        - For the OS to make the right choices it needs to be aware of the trade-offs
+            + Is the speed comparison between registers, DRAM and Disks like the diference between your mind, pocket and Bookshelf
+              OR is it more like the diference between your pocket, the bookstore, and Pluto
+            + How much computation/meta-data storage is reasonable to do to avoid a disk access?
+            + Should we use DRAM as a file cacheor to store more memory page for processes?
+        - "Right" answer changes with new generations of technology and OS source lives much longer than that?
+        - Can OS measure performance and be coded to react to measurements?
+
+
+-- Slide Set 14 -- RAID ---------------------------------------------------------------------------
+    
+    Redundant Array of Independant/Inexpensive Disks (RAID):
+        - Basic ideas is to use a collection of disks working together, rather than just indepenedant
+          disks owrking in isolation (Just a Bunch Of Disks (JBOD)), to acheive better realiability, performance, etc.
+        - Type of storage virtualization, building an illusion of one logical storage device 
+          out of many underlying physical storage devices
+        - History
+            + Originally proposed by David Patterson, Garth Gibson, and Randy Katz at UC Berkly
+            + Proposed 5 original RAID levels or configurations (RAID 1-5)
+                * Each level or configuration has different realiability, capacity, and performance properties based on 
+                  how the physical disks are arranged/used
+                * Some more for comparison - not really commercialy viable 
+            + Sinse then, other RAID levels proposed
+
+    RAID 1:
+        - Mirroring
+        - Writes go to both disks (slightly slower)
+        - Reads go to either (faster)
+        - If one disk fails, all data is still on the other
+        - Storage capacity is cut in half
+        - Block size can vary but is at least a sector (512 bytes)
+        
+        Disk 0      Disk 1
+        +---------+ +---------+
+        | Block 1 | | Block 1 |
+        | Block 2 | | Block 2 |
+        | Block 3 | | Block 3 |
+        | Block 4 | | Block 4 |
+        | Block 5 | | Block 5 |
+        +---------+ +---------+
+
+    RAID 2 & 3:
+        - Other 2 original RAID levels
+        - Both about bit interleaving of data
+        - Show inspiration from memory redundancy
+        - Not important commercialy
+
+    RAID 4:
+        - Blocks interleaved across multiple data disks in a stripe
+        - Parity disk stores the XOR of the contents of the other blocks in the stripe
+        - Parity: add data bits and parity is 1 if odd and 0 if even - sum of 1's always even
+        - Parity can be used reconstruct contents of a drive that fails
+        - Large writes - 1 extra disk write
+            + Just have to rewrite the parity not read and update
+        - Small writes - Read only, read parity, write new, write parity!
+          Parity drive always invloved = bottleneck
+            * Only one stripe can update at a time becuase the parity disk is already being written to
+        - Recovery expensive
+
+        Disk 0       Disk 1       Disk 2       Disk 3       Parity Disk
+        +----------+ +----------+ +----------+ +----------+ +--------------+
+        | Block 1  | | Block 2  | | Block 3  | | Block 4  | | Parity 1-4   |
+        | Block 5  | | Block 6  | | Block 7  | | Block 8  | | Parity 5-8   |
+        | Block 9  | | Block 10 | | Block 11 | | Block 12 | | Parity 9-12  | 
+        | Block 13 | | Block 14 | | Block 15 | | Block 16 | | Parity 13-16 | 
+        | Block 17 | | Block 18 | | Block 19 | | Block 20 | | Parity 17-20 | 
+        +----------+ +----------+ +----------+ +----------+ +--------------+
+
+    RAID 5:
+        - Like RAID 4 but parity rotates
+        - Releives bottleneck of the parity drive
+        - Also all drives can participate in servicing small read requests (rather than n-1 for raid 4)
+        - RAID 4 exists for comparison
+
+        Disk 0           Disk 1           Disk 2           Disk 3           Disk 4
+        +--------------+ +--------------+ +--------------+ +--------------+ +--------------+
+        | Block 1      | | Block 2      | | Block 3      | | Block 4      | | Parity 1-4   |
+        | Block 6      | | Block 7      | | Block 8      | | Parity 5-8   | | Block 5      |
+        | Block 11     | | Block 12     | | Parity 9-12  | | Block 9      | | Block 10     |  
+        | Block 16     | | Parity 13-16 | | Block 13     | | Block 14     | | Block 15     |  
+        | Parity 17-20 | | Block 17     | | Block 18     | | Block 19     | | Block 20     |  
+        +--------------+ +--------------+ +--------------+ +--------------+ +--------------+
+
+    Ways to beat RAID 5 4x penalty:
+        - 2 Reads and 2 Writes per small write
+        - Do parity updates in the background in idle time
+            + Of course if we lose data then any parity not yet updated is a problem
+        - Have a large write cache so that you combine many small writes in the same stripe
+            + If we lose power we lose recent data
+            + Write cache from non-volitile RAM?
+    
+    RAID 0:
+        - Striping 
+        - Not one of the original 5 raid levels
+        - Like raid 4 and 5 but no parity, ie no redundancy
+        - If dont care about disk failure, this has best performance and no lost capacity
+
+        Disk 0       Disk 1       Disk 2       Disk 3       Disk 4
+        +----------+ +----------+ +----------+ +----------+ +----------+
+        | Block 1  | | Block 2  | | Block 3  | | Block 4  | | Block 5  |
+        | Block 6  | | Block 7  | | Block 8  | | Block 9  | | Block 10 |
+        | Block 11 | | Block 12 | | Block 13 | | Block 14 | | Block 15 | 
+        | Block 16 | | Block 17 | | Block 18 | | Block 19 | | Block 20 | 
+        | Block 21 | | Block 22 | | Block 23 | | Block 24 | | Block 25 | 
+        +----------+ +----------+ +----------+ +----------+ +----------+
+
+    RAID 10 (1+0 or 1&0)
+        - A stripe of mirrors
+            + Highest level originzation is striping across logical drives (ie RAID 0)
+            + Then each logical drive is made up of a mirrored pair (ie RAID 1)
+        - Consider how availibility properties - how many drives could fail without data loss?
+            + At least 1 and in some cases 2 (eg disk 0/1 and disk 2/4) 
+        - Consider performance properties - large writes, large reads, small writes, small reads
+            + Same as RAID 1, write to both disks in logical disk and read either disk in the logical disk
+
+        Logical Disk 0            Logical Disk 1
+        +-----------------------+ +-------------------------+
+        |Disk 0      Disk 1     | |Disk 2       Disk 3      |
+        |+---------+ +---------+| |+----------+ +----------+|
+        || Block 1 | | Block 1 || || Block 2  | | Block 2  ||
+        || Block 3 | | Block 3 || || Block 4  | | Block 4  ||
+        || Block 5 | | Block 5 || || Block 6  | | Block 6  ||
+        || Block 7 | | Block 7 || || Block 8  | | Block 9  ||
+        || Block 9 | | Block 9 || || Block 10 | | Block 10 ||
+        |+---------+ +---------+| |+----------+ +----------+|
+        +-----------------------+ +-------------------------+ 
+
+    RAID 01 (0+1 or 0&1)
+        - Mirror of stripes
+            + Highest level orginzation is mirroring across logical drives (ie raid 1)
+            + Then each logical drive is made up of a stripe (ie RAID 0)
+
+        Logical Disk 0            Logical Disk 1
+        +------------------------+ +------------------------+
+        |Disk 0      Disk 1      | |Disk 2       Disk 3     |
+        |+---------+ +----------+| |+---------+ +----------+|
+        || Block 1 | | Block 2  || || Block 1 | | Block 2  ||
+        || Block 3 | | Block 4  || || Block 3 | | Block 4  ||
+        || Block 5 | | Block 6  || || Block 5 | | Block 6  ||
+        || Block 7 | | Block 8  || || Block 7 | | Block 9  ||
+        || Block 9 | | Block 10 || || Block 9 | | Block 10 ||
+        |+---------+ +----------+| |+---------+ +----------+|
+        +------------------------+ +------------------------+ 
+
+    RAID naming conventions:
+        - Last number is the highest level originization
+        - closest number is the lowest level organization
+        - RAID 51
+            + Highest level orgnization is mirroring across logical drives (ie raid 1)
+            + Then each logical drive is made up of a distributed parity drives (ie RAID 5)
+        - RAID 15
+            + Highest level orgnization is distributed parity drives (ie RAID 5)
+            + Then each distributed parity drive is mirrored across logical drives (ie raid 1)
+        - RAID 100
+            + Highest level orginization is striping across a series of >2 logical drives (ie RAID 0)
+            + Middle level orginization is striping across logical drives (ie RAID 0)
+            + Then each logical drive is made up of a mirrored pair (ie RAID 1)
+    
+    RAID 10 vs RAID 5:
+        - Sample comparison
+        - Raid 10 has less usable capacity than raid 5 (1/2 to redundancy vs 1/n)
+        - RAID 10 avoids the 4x small write penalty
+        - RAID 10 cant use n-1 spindles for large writes though
+        - Both can use all drives for reading in pararllel
+        - RAID 10 can handle multiple drive failure in some cases
+
+    RAID 6:
+        - Always tolerate 2 disk failures
+        - Extra disk and in each stripe two used to store parity information
+            + Actually 2 different types of parity calculation
+        - instead of 2 accesses for a small write have 6
+        - Expensive but given how instensive recovery is in RAID 5, chances of second failure while recovering
+          is relitively high especially considering the chance of corelated failures
+            + Dont want a second drive failure at just the wrong time
+    
+    Correlated faiures:
+        - Drives exposed to the same workload, temperature etc.
+        - If buy drives from the same manufacturer at the same time, can also be corrlated failures there
+        - Can be good to buy a bunch of same size drives from multiple vendors
+            * Careful, one slow or small drive can drag others down
+
+    Hot Spares:
+        - Literally an empty replacment drive hooked up in case of a catastrophic failure in an active drive in the RAID
+        - Common to leave unused disks of the right side in the RAID
+        - If disk fails, sont want to run in degredated state, want to complete recovery quickly
+        - Dont want silent failure though because need to order new drive etc
+        - some systems "phone home" on their own and order parts
+
+    Proprietary RAID levels:
+        - All sorts of non standard RAIDXX levels
+            + RAID DP. RAID S, RAID 5EE, RAID 50EE, RAID Z, vRAID, RAID 1E
+
+    Hardware vs Software Raid:
+        - RAID can be inplemented in either software or hardware
+        - Hardware RAID exports a signle disk image to the OS and hides details to a HW appliance
+        - Software RAID implements RAID functionality out of JBOD
+
+    Configuration Advice:
+        - Matching stripe size to workload
+        - Large files, large streaming access => large stripe size
+        - Small files, small random access => small stripe size
+
+    Still need backup:
+        - Controller Error
+        - Human Error
+        - Site Disaster
+
+
+-- Slide Set 15 -- File Sytem Basics --------------------------------------------------------------
+
+
+     Files:
+        - A File is a collection of data within a system maintained by properties like
+            + owner, size, name, last read/wrtie time, etc.
+        - Files often have "types" which allow users and applicaitons to recognize their intended use
+        - Some file types are understood by the file system
+            + Mount point, symbolic link, directory
+        - Some file types are understood by applications and users
+            + .txt, .jpg, .html, .doc 
+            + Could the system understand these types and customize its handling?
+
+    Directories:
+        - Provide a way for users to organize their files *and* a convient way forusers to identify and share data
+        - Logically directories store information like file name, size, modification time etc (Not always kept in the directory though)
+        - Most file systems support hierarical directories
+            + /user/local/bin/ or C:/WININT
+            + People like to organize information hierarically
+        - Recall an OS often records a current working directory for each process
+            + Can therefore refer to files by absolute and reletive names
+        - Directories are special files
+            + Directories are files containing information to be interpreted by the file system itself
+                * List of files and other directories contained in this directory
+                * Some attributes of each child including where to find it
+            + How should the list of children be organized?
+                * Flat File
+                * B-tree?
+            + Many Systems have no particular order, but this is extremely bad for large directories
+        - Multiple parent directories
+            + One natural question is "can a file be in more than one directory?"
+            + Soft Links
+                * Special File interpreted by the file system (like directories in that sense)
+                * Tell FS to look at different pathname for this file
+                * If file is deleted or moved, soft link will point to wrong place
+            + Hard Links
+                * Along with other file info maintain referance count
+                * Delete File = decrement referance count
+                * Only reclaim stroage when referance count goes to 0
+
+    Path Name Translation:
+        - To find file "/foo/bar/baz"
+            + Find the special root directory file (how does FS know where it is)
+            + In the special root directory file, look for entry foo and that entry will tell you where foo is
+            + Read special directory file foo and look for where entry bar is
+            + Find special directory file bar and look for entry baz to tell you where baz is
+            + Finally read baz
+        - FS can cache common/recent prefixes for efficiency
+            + Translation is expensive
+    
+    File Buffer Cache:
+        - Cache Data read
+            + Exploit temporal locality of access by caching pathname translation information
+            + Exploit temporal locality of access by leaving recently accessed chinks of a file in memory
+              in hopes that they will be accessed again
+            + Exploit spacial locality of access by bringing in large chunks of a file at once
+        - Data written is also cached   
+            + For correctness should be write through to disk
+            + Normally is write-behind
+                * FS periodically walks the buffer cache and "flushes" things older than 30 seconds to disk
+                * unreliable
+        - Usually LRU replacement
+        - Typically cache is system wide (shared by all processes)
+            + Shared libraries and executables and other commonly accessed files likely to be in memory already
+        - Completes with virtual memory for physical memory
+            + Processes have less memory available to them to store code and data (address space)
+            + Some systems have integrated VM/FS caches
+
+    Protection System:
+        - Most FS implement a protection scheme to control
+            + Who can access a file
+            + How they can access it
+        - Any protection system dictates whether a given action performed 
+          by a given subject on a given object should be allowed. In this case
+            + Objects = files
+            + Principles = users
+            + Actions = operators
+        
+    File Layout:
+        - Option 1: all blocks in a file must be allocated contigiously
+            + Only need to list start of a file and length in directory
+            + Causes fragmentation of free space
+            + Also causes copying as files grow
+        - Option 2: Allow files to be broken into peices
+            + Fixed size pieces (blocks) or variable sized pieces (extends)?
+            + If we are going to allow filest obe broken up into multiple pieces how will we keep track of them?
+    
+    Blocks Vs Extends:
+        - If fixed sized blocks then store starting location of each one
+        - If variable sized extent need to store starting location and length
+            + But maybe have fewer extends
+        - Blocks = less external fragmentation
+        - Extends = less internal fragmentation
+
+    Finding all parts of a file
+        - Option 2A: List all bokcs in the directory
+            + Directories will get pretty big and also must change the directory every time a file grows or shrinks
+        - Option 2B: Linked structures
+            + Directory points to first piece (block or extend), first one points to second one
+            + File can expand and contract without copying
+            + Good for sequential access, terrible for other kinds
+        - Option 2C: Indexed structure
+            + Directory points to index block which contains pointers to data blocks
+            + Good for random access as well as sequential access
+
+    UNIX Inodes
+        - Inode = indexed node
+            + Files Broken into fixed size blocks 
+            + Inodes contain pointers to all the file blocks
+            + Directory points to location of inodes
+        - Each inode contains 15 block pointers
+            + First 12 point directly to data blocks
+            + Then single, doubly and triply indirect blocks
+        - Inodes often contain information like last modification time, size etc.
+          that could logically be associated with a directory
+        - NOTE: indirect blocks sometimes numbered as file blocks -1, -2, etc.
+
+        Inode
+        +------------------------------+
+        | Size                         |
+        | Last mod                     |
+        | Owner                        |
+        | permissions                  |
+        |+------------------------------+
+        |LBA of file block 1           | ----> [File Block]
+        +------------------------------+
+        |LBA of file block 2           | ----> [File Block]
+        +------------------------------+
+        |        ...                   | ----> [File Block]
+        +------------------------------+
+        |LBA of file block 11          | ----> [File Block]
+        +------------------------------+
+        |LBA of file block 12          | ----> [File Block]
+        +------------------------------+
+        |LBA of singly indirect block  | ----> [LBAs of file blocks] ----> [File Blocks]
+        +------------------------------+
+        |LBA of doubly indirect block  | ----> [LBAs of singly indirect file blocks] ----> [LBAs of file blocks] ----> [File Blocks]
+        +------------------------------+
+        |LBA of triply indirect block  | ----> [LBA of doubly indirect blocks] ----> [LBAs of singly indirect file blocks] ----> [LBAs of file blocks] ----> [File Blocks]
+        +------------------------------+
+
+    Max File Size?
+        - Assume
+            + 4K data pages and inodes
+            + Lbas are typically 4 bytes
+        - First 48k directly reachable from inode
+        - One singly indirect block reaches 1024 more blocks = 4M
+        - one doubly indirect block points to 1024 more singly indirect blocks which each poin to 4M of data = 4GB
+        - One triply indirect block points to 1024 more doubly indirect blocks which each poin to 4GB of data = 4TB
+        - Max file or directory size = 4TB + 4GB + 4MB + 48KB
+
+    Path Name Traversal Revisited:
+        - Directories are just special files so they have inodes of their own
+        - To find /foo/bar/baz (assuming nothing is cached)
+        - Look in super block and find location of I-node for /
+        - Read inode for /, find location of first datablock of /
+        - Repeat with all 13 blocks of / until find every entry for foo, if read until block 13, then must read singly indirect block first...
+        - When find entry for foo gives adress of Inode for foo, read inode for foo...
+        - Reapeat down the path
+
+    Keeping track of free space:
+        - Linked list of free space
+            + Just put freed blocks on the end and pull blocks from front to allocate
+            + Hard to manage spatial locality (why important?)
+            + If middle gets corruted how do you repair?
+        - Bit Map
+            + Divide up all space into blocks
+            + Bit per block (0 = free, 1 = allocated)
+            + Easy to find groups of nearby blocks
+            + Useful for disk recovery
+            + How big? If I had 40 BG disk, then have 10 M of 4K blocks, if each needs 1 bit then 10M/8 = 1.2 MB for the bit map
+
+
+-- Slide Set 16 -- FFS and LFS --------------------------------------------------------------------
+
+    Fast File System (FFS)
+        - Fast? Wwll faster tahn the original UNIX files system in 1970
+            + original system had poor disk bandwidth
+            + too many seeks
+        - BSD Unix folks resdesigned in mid 1980s
+            + Imporved disk utilization by breaking files into larger pieces
+            + Made ffs aware of disk structure (cylinder groups) and tried to keep related things together
+            + Other semi random improvemtns like support for long file names etc.
+        - Break disk into cylinder groups and then into fixed size pieces called blocks (commonly 4KB)
+        - Each cylinder group has a certain number of blocks
+            + Cylinder group's free list maps which blocks free and which taken
+            + Cylinder groups also store a copy of the superblock which contains special bootstrapping information
+            location of the root directory (replicated)
+            + Cylinder groups also contain a fixed number of inodes
+            + Rest of blocks used to store file/directory data
+        - Inodes in FFS
+            + Fixed number of inodes at FS format time
+                * When we create the file, pick an inode, will never move (so directory entry need not be updated)
+                * Can run out of inodes and not be able to create file even though there is free space
+        - Creating a new file 
+            + Divide the disk into cylinder groups
+                * Try to put all blocks of file into same cylinder group
+                * Inodes in each cylinder group so inodes near thier files
+                * Try to put files in teh same directory into the same cylinder group
+                * Big things forced into new cylinder group
+            + Is this fundamentally a new approach?
+                * No, space within a cylinder group gets treated just like the whole disk was
+                * Space in a cylinder group gets fragmented etc
+                * Bascily sort files into bins so reduce the frequent long seeks
+        - Cynlinder groups
+            + To keep things together we must know when to keep things apart
+                * Put large files into different cylinder groups
+            + FFS reserves 10% of teh disk as free space
+                * To be able to sort things into cylinder groups, must have free space in each cylinder group
+                * 10 % free space avoids worst allocation choice as it approaches full
+        - Other FFS Imporvements
+            + small or large blocks?
+                * orig unix FS had small blocks (1KB)
+                * 1/4 less efficent BW utilization
+            + Larger blocks have problems too
+                * for files < 4K, results in internal fragmentaion
+                * FFS uses 4K blocks but allows fragments within a block
+                * Last, > 4k of a file can be in fragments
+            + Exactly 4k
+                * FFS allows FS to be paremeterized to the disk and CPU characteristics
+                * another cool example: when laying out logically sequential blocks, skip a few blocks in between each to 
+                allow for the CPU interrupt processesing so dont justmiss the blocks and force a whole rotation
+        -Update in place
+            + Both the original UNIX FS and FFS were update in place
+            + When block X ofa file is written then forever more, 
+            reads or writes to block x go to that location until file deleted or truncated
+            + As things get fragmented need "defragmenter" to reorganize things
+        - Another problem with update in place: poor crash recovery performance
+            + Some operations take multiple disk requests so are imposible to do atomically
+                * atomically - either everything happens at once or nothing does
+                * Ex. Write a new file (update directory, remove space from free list, write inode and data blocks, etc.)
+            + If system crashes (lose power or software failure), there may be file operations in progress
+            + When a system comes back up, may need to find a fix to these half done operations
+            + Where are they?
+                * Could be anywhere?
+                * How can we restore consistency to the file system
+        - Fixed order --------- TODO: for user file system ---------
+            + Solution: specificly order in which FS ops are done
+            + Example to add a file
+                * Update free list structures to show data block taken
+                * Write the data block
+                * Update free list structures to show an inode take
+                * Write the inode
+                * Add entry to the directory
+            + If a crash occurs, on reboot scan disk looking for half done operations
+                * Inodes that are marked taken but are not refered to by any directory
+                * Data blocks that are marked taken but are not referred to by any inode
+            + Weve found a half done operations, now what?
+                * If data is not pointed to by any inode then release them
+                * If inode not pointed to by any directory link into lost and found
+            + fsck and silimar FS recovery programs do these kinds of checks
+                * Problems can be anywhere with update in place so must scan the whole FS
+            + Problems?
+                * Recovery takes a long time
+                * Even wrose(?) normal operation takes a long time because specific order = many small synchonous writes = slow
+
+    Write-Ahead Logging (Journaling):
+        - How can we solve problem of recovery in update in place systems?
+        - Borrow a technique from dataabses!
+            + Loging or Journaling
+        - Before preform a file system operation like create new file or move a file, make a note in the log
+        - If crash, can simply examine the log to find interrupted operations
+            + Dont need to examine the while disk
+        - Checkpoints
+            + periodically write a checkpoint to a well known location
+            + Checkpoint establishes a consistent point in the file system
+            + Checkpoint also contains pointer to tail of the log (changes since checkpoint written)
+            + On recovery start at checkpoint and then "roll forward" through the log
+            + Checkpoint points to location system will use for first log write after checkpoint, then each log write after checkpoint, 
+              then each log write has pointer to next location to be used
+                * Eventually go to noxt location and find it empty or invalid
+            + When writing a checkpoint, can discard earlier portions of the log
+        - Problems
+            + Do writes twice
+                * Once to log and once to "real" data (Still organized like FFS)
+            + Surprisingly can be mor efficent than update-in-place
+                * Batched to log and then replayed to "real" in relaxed order (elevator sceduling on the disk)
+        - Recovery of the file system (not your data)
+            + Write-ahead logging or journaling techniques could be used to protect FS and user data
+            + Normally just used to protect the FS
+            + I look like a consistent FS but your data may be inconsistent
+                * Even if some of the last files you were modifying are inconsistent still better than FS corrupted
+            + Still why do we need a "real" data layout why couldn't the log be the FS? The user data would get the same benifits
+
+    Log-Structured File Systems
+        - Treat the disk as an infinite append only log 
+            + Data blocks, inodes directories everything written to log
+        - Batch wrtites in large units called segments (~1MB)
+        - Garbage collection process called cleaner recalims holes in the log to regenerate large expanses of free space for log writes
+            + As files get deleted or updated, this leaves a hole in log segments. Cleaners go thorugh and try to clear out whole segments and fill the 
+              data that was in a partially empty segment into the tail of the log so as to keep segments free and limit fragmentation
+        - Finding data
+            + Inodes used to find datablocks
+            + Finding inodes?
+                * directories specify location of a file's inode
+            + in an FFS, inodes are preallocated in each cylinder group and given file's inode never moves
+            + In an LFS, inodes written to the log and so they move
+        - Chain reaction
+            + LFS is not update in place when a file block written its location changes
+                * File location changes => entry in inode (and possibly also indirect blocks) changes
+                  => Inode (and indirect blocks) must be rewritten
+            + Parent directory contains location of inode – must directory be rewritten too? 
+                * If so then all directories to root must be rewritten?
+            + No, introduce another level of indirection
+                * Directory says inode *number* (rather than location)
+                * inode map to map inode number to current location 
+        - Inode map
+            + Inode map maps inode numbers to inode location
+                * map kept in a special file called the ifile 
+            + When a files inode is written, its parent directory does not change, only the ifile does
+            + Caching inode map (ifile) in memory is pretty important for good performance
+                * how big is this? Approx 2*4 bytes (inode number and disk LBA) = 8 bytes for every file/directory in the file system
+                * Can grow dynamically unlike FFS
+        - Checkpoint
+            + Like in write ahead logging, write periodic Checkpoints   
+                * kind of like FFS superblocks
+            + Checkpoint region has a fixed location
+                * Actually two fixed locations and alternate between them in case it dies in the middle of writing and is left corrupt
+                * Checksums to verify consistent; timestamps say which was most recent
+            + Whats in checkpoint?
+                * Location of inode for ifile and inode number of the root directory
+                * Location of next segment will write log to
+                * Basic FS parameters like segment size, block size, etc.
+        - Pros 
+            + Leverage disk BW with large sequential writes
+            + Near perfect write performance
+            + Read perfomance? Good if read the same way as you write and many reads absorbed by cache
+            + Cleaning can often be done in idle time
+            + Fast, efficent crash recovery
+            + User data egts benifits of a log
+        - Cons
+            + Reads may not follow write patterns (they may not follow directory structure either though)
+            + Aditional metadata handling (inodes, indirect blocks and ifile rewritten frequently)
+            + Cleaning overhead can be high - especially in case of random updates to a full disk with little idle time
+        - Cleaning costs 
+            + We are going to focus on talking about the problem of high cleaning costs
+            + Often cleaning is not a problem 
+                * If there is plenty of idle time (many workloads have this), cleaning costs hidden
+                * Also if locality to writes, then easier to clean
+                * If disk not very full then, segments clean themselves (overwrite everything in old segments before run out of free spaces for new writes)
+            + So when is cleaning a problem?
+                * Cleaning expensive when random writes to full disk with no idle time
+                * Random writes, full disk (little free space), no idle time = Sky-rocketting cleaning costs
+                * For every 4 blocks written, also read 4 segments and write 3 segments!
+        - Copy cleaning vs hole plugging
+            + Alternate cleaning method?
+                * Hole-plugging = Take one segment break extract the live data and use it to plug holes in other segments
+                * This will work well for full disk, random updates, little idle time!!
+            + Hole-plugging avoids problems with copy cleaning but transfers many small blocks which uses the disk less efficiently
+                * Could we get the best of both worlds?
+                * First we have to talk about how to quantify the tradeoffs
+        - Write cost
+            + How do we quantify the benifits of large I/Os vs the penalty of copying data
+            + Original LFS paper evaluated the efficiency of cleaning algorithms according to the following metric
+                * (DataWrittenNewData + DataReadCleaning + DataWrittenCleaning)/ DataWrittenNewData
+                * Quantifies cleaning overhead in terms of the amount of data transferred while cleaning
+                * What about the impact of large vs small transfers?
+            + Cost of small transfers
+                * Quantify overhead due to using the disk inefficiently
+                    ~ TransferTimeActual/TransferTimeIdeal
+                    ~ Where TransferTimeActual includes seek and rotational delay and transfer time and TransferTimeIdeal only includes transfer time
+                * By factoring in the cost of small transfers, we see the cost of holeplugging
+            + Overall write cost
+                * Ratio of actual to ideal costs where
+                    ~ Actual includes cost of garbage collection and includes seek/rotational latency for each transfer
+                    ~ Ideal includes only cost of original writes to an infinite append only log – no seek/rotational delay and no garbage collection
+                * Now we have a metric that lets us compare hole-plugging to copy-cleaning that the systen can use to choose which one to do
+        - Adaptive Cleaning
+            + When starting to run out of segments, do garbage collection
+            + look in special file called the segmap that tells you how full each segment is
+                * when rewriting a block in a segment, write in segmap file that segment is one block less full
+            + Estimate cost to do copy cleaning and cost to do hole-plugging 
+                * Compute overall write cost by seeing how full segments are
+            + Choose the most cost effective method this time
+                * Can be different next time
+        - Other factors?
+            + How does this layout work for reads?
+                * Good if in the same way you write
+                * Well until start reorganizing during cleaning
+                  (hole plugging is worse than copy cleaning here)
+                * Special kind if hole-plugging that writes back on top where it used to be?
+            + Accounting for aditional metadata handling in cache?
+                * Modifying the write cost metric to account for "churn" in the metadata?
+                * Model FFS in this same way
+
+    Improving FFS
+        - Extent like performance (McVoy)
+        - FFS-realloc (McKusick)
+        - FFS-frag and FFS-nochange(Smith)
+        - Colocating FFS (Ganger)
+        - Soft Updates (Ganger)
+
+    Other FS
+        - Update-in-place
+            + FAT
+            + ext2 (extent based rather than fixed size blocks)
+        - Write-ahead Logging (journaling)
+            + NTFS
+            + ReiserFS (B+ tree indices, optimizations for small files)
+            + SGI’s XFS (extent based and B+ trees)
+            + Ext3 (journaling version of ext2)
+            + Veritas VxFS
+            + BeOS’s BeFS
+        - No Update?
+            + CD-ROM FS no update and often contiguous allocations (why does that make sense?) 
+
+    Network/Distributed FS
+        - NFS
+        - AFS and Coda
+            + Transarc’s (now IBM’s) commercial AFS
+            + Intermezzo (Linux Coda like system)
+        - Netware’s NCP
+        - SMB
+
+    Multiple FS?
+        - With all these choices, do we really need to choose just one FS for our FS
+        - If we want to allow multiple FS in the same OS, what would we have to do?
+            + Merge them into one directory hierarchy for the user
+            + Make them obey a common interface for the rest of the OS
+    
+    Mount Points
+        - Another kind of special file interpreted by the file system is a mount point
+        - Contains information about how to access the root of a separate FS tree 
+          (device information if local, server information if remote, type of FS, etc.)
+
+    Common Interfaces
+        - Struct vnode
+            + One vnode structure for every opened (in-use) file
+            + Contains
+                * Array of pointers to procedures to implement basic operations on files
+                * Pointer to parent FS
+                * Pointer to FS that is mounted on top of this file (if any)
+                * Reference count so know when to release the vnode
+            + Vnode Operations
+                * Open, close, create, remove, read, write
+                * Mkdir, rmdir, readdir
+                * You don’t know what that FS’s directory format will be
+                * Symlink, Link, readlink (soft/hard links)
+                * Getattr, setattr, access (get/set/check attributes like permissions)
+                * Fsync
+                * Seek
+                * Map, getpage, putpage (memory map a file)
+                * Ioctl (misc I/O control ops)
+                * Rename
+        - Struct vfs
+            + One vfs structure in the OS for each mounted fs
+            + Contains
+                * Array of pointers to procedures that implement basic operations on file systems
+                * FS type
+                * Native block size
+                * Pointer to vnode this FS is mounted on
+            + vfs Operations
+                * Mount: procedure called to mount a FS of this type on a specified vnode
+                * Unmount: procedure to release this FS
+                * Root: return root vnode of this Fs
+                * Statvfs: return research usage status of the FS 
+                * Sync: flush all dirty memory buffers to persistent storage managed by this FS
+                * Vget: turn a fileId into a a pointer to vnode for a specific file
+                * Mountroot: mount this FS as the root FS on this host
+                * Swapvp: return vnode of file in this FS to which the OS can swap
+
+    Do we need an FS Interface?
+        - Giving things file names seems arbitary
+        - FS hierarchy vs directory search
+        - People like to find information both ways
+            + I know exactly what I want don’t bother looking for me I will get it myself
+            + Give me everything matching these characteristics
+

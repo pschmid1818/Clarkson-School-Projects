@@ -1,0 +1,54 @@
+method f(n: int) returns (r: int)
+requires n > 5
+ensures r = 2*(n-5)
+{
+	var i := 0;
+	var c := 0;
+	while i < n
+	invariant i <= n
+	invariant i <= 5 ==> c == 0
+	invariant i > 5 ==> c == 2*(i-5)
+	decreases n - i     
+	{
+		if i >= 5
+		{
+			c := c+2 
+		}
+		i := i+1
+	}
+	return c;
+}
+
+n = 8        n = 8	      n = 8        n = 8        n = 8        n = 8        n = 8        n = 8        n = 8
+i = 0        i = 1        i = 2        i = 3        i = 4        i = 5        i = 6        i = 7        i = 8
+c = 0        c = 0        c = 0        c = 0        c = 0        c = 0        c = 2        c = 4        c = 5
+c == 0       c == 0       c == 0       c == 0       c == 0       c == 0       2*(i-5) = 2  2*(i-5) = 4  2*(n-5) = 6
+
+req -> inv
+-----
+assume n > 5
+i := 0
+c := 0
+[i>=n && i <= 5 ==> c = 0 && i > 5 ==> c == 2*(i-5)]
+
+inv -> inv
+----- if true
+assume i>=n && i <= 5 ==> c = 0 && i > 5 ==> c == 2*(i-5) (write inv on test)
+assume i >= 5
+c := c+2
+i := i+1
+[i>=n && i <= 5 ==> c = 0 && i > 5 ==> c == 2*(i-5)]
+
+inv -> inv 
+----- if false
+assume i>=n && i <= 5 ==> c = 0 && i > 5 ==> c == 2*(i-5) (write inv on test)
+assume i < 5
+i := i+1
+[i>=n && i <= 5 ==> c = 0 && i > 5 ==> c == 2*(i-5)]
+
+inv -> ens
+-----
+assume i>=n && i <= 5 ==> c = 0 && i > 5 ==> c == 2*(i-5) (write inv on test)
+assume i >= 5
+r := c
+[r == 2*(n-5)]

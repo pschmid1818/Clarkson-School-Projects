@@ -1,0 +1,29 @@
+//lynch code
+method Duplicate(A: array<int>) returns(r: bool)
+ensures r == exists i, j : 0 <= i < j < A.length ==> A[i] == A[j]
+{
+  var i := 0;
+  var j;
+  while i < A.Length
+  invariant 0 <= i <= A.Length
+  //We haven't found a duplicate yet
+  //we checked all indecies smaller than i against all later values
+  invariant forall k :: forall p :: 0 <= k < i && k < p < A.Length => A[k] != A[p]
+  {
+    j := i + 1;
+    while j < A.Length
+	invariant 0 <= i < j <= A.Length
+	//we haven't found a duplicate so far
+	//we have checked i against everything j
+	invariant forall p :: i < p < j ==> A[i] != A[p]
+    {
+      if A[i] == A[j]
+      {
+        return true;
+      }
+      j := j + 1;
+    }
+    i := i + 1;
+  }
+  return false;
+}

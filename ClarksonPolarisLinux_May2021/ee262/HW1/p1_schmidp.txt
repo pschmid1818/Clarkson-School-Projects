@@ -1,0 +1,25 @@
+PuTTy
+
+1)  schmidp
+3)  Tue Sep 11 22:28:24 ETD 2018
+4)  /afs/sd.clarkson.edu/users/s/c/schmidp/ee262
+5)  a simple test
+6)  total 15
+    drwxr-xr-x 2 schmidp users 2048 Aug 31 12:32 .
+    drwxrwxrwx 6 root    root  2048 Aug 31 12:07 ..
+    -rwxr-xr-x 1 schmidp users 8888 Aug 31 12:31 a.out   
+    -rw-r--r-- schmidp users  130 Aug 31 12:31 hello.bkup
+    -rw-r--r-- schmidp users  130 Aug 31 12:31 hello.cpp
+7)  polaris.clarkson.edu
+8)  g++ (GCC) 4.8.5 20150623 (Red Hat 4.8.5-28)
+    Copyright (C) 2015 Free Software Foundation, Inc.
+    This is free software; see the source for copying conditions. There is NO
+    warranty; not even for MERCANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+9)  3
+10) data
+    
+    line2
+11) line2
+12) line2
+13) 3
+14) 3

@@ -1,0 +1,236 @@
+Script started on Wed 24 Feb 2021 02:26:08 PM EST
+[?1034hbash-4.2$ wget https://lin-web.clarkson.edu/~jmathew[K[K[Kthew/os/labs6[K[K6/01_gridapp_nolocking.c
+--2021-02-24 14:27:17--  https://lin-web.clarkson.edu/~jmatthew/os/lab6/01_gridapp_nolocking.c
+Resolving lin-web.clarkson.edu (lin-web.clarkson.edu)... 128.153.4.74
+Connecting to lin-web.clarkson.edu (lin-web.clarkson.edu)|128.153.4.74|:443... connected.
+HTTP request sent, awaiting response... 404 Not Found
+2021-02-24 14:27:17 ERROR 404: Not Found.
+
+bash-4.2$ wget https://lin-web.clarkson.edu/~jmatthew/os/lab6/01_gridapp_nolocking.c[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Khttps://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/01_gridapp_nolocking.c
+--2021-02-24 14:27:27--  https://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/01_gridapp_nolocking.c
+Resolving lin-web.clarkson.edu (lin-web.clarkson.edu)... 128.153.4.74
+Connecting to lin-web.clarkson.edu (lin-web.clarkson.edu)|128.153.4.74|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 3738 (3.7K) [text/plain]
+Saving to: ‘01_gridapp_nolocking.c’
+
+ 0% [                                                                                                                                                                                                    ] 0           --.-K/s              100%[===================================================================================================================================================================================================>] 3,738       --.-K/s   in 0s      
+
+2021-02-24 14:27:27 (208 MB/s) - ‘01_gridapp_nolocking.c’ saved [3738/3738]
+
+bash-4.2$ gcc -o[K[K01_gridapp_nolocking.c -o gridapp
+/tmp/cc1x6Rlp.o: In function `main':
+01_gridapp_nolocking.c:(.text+0x48c): undefined reference to `pthread_create'
+01_gridapp_nolocking.c:(.text+0x4ce): undefined reference to `pthread_detach'
+collect2: error: ld returned 1 exit status
+bash-4.2$ ls
+01_gridapp_nolocking.c	cs141  cs344  cs355  cs455  ee262  ee344lab3.cpp  ee363  ee462	lab3  multifind  multifind.cpp	public	public_html  schmidp.txt
+bash-4.2$ lsgcc 01_gridapp_nolocking.c -o gridapp[C[C[C[C[C[C[C[C[C[Cwget https://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/01_gridapp_nolocking.c[C[C[C[C[C[C[C[C[C[C[42Pgcc 01_gridapp_nolocking.c -o gridapp[C[C[C[C[C[C[C[C[C[Cls[K[Knano 01_gridapp_nolocking.c 
+[?1049h[1;63r(B[m[4l[?7h[?12l[?25h[?1h=[?1h=[?1h=[39;49m[39;49m(B[m[H[2J(B[0;7m  GNU nano 2.3.1                                                              File: 01_gridapp_nolocking.c                                                                                                                                   [3;1H(B[m//[4d//  gridapp.c[5d//  CS444 Grid Locking[7d#include <stdio.h>[8d#include <stdlib.h>[9d#include <time.h>[10d#include <unistd.h>[11d#include <pthread.h>[12d#include <errno.h>[15d#define MAXGRIDSIZE   20[16d#define MAXTHREADS  1000[17d#define NO_SWAPS  20[19dextern int errno;[21dtypedef enum {GRID, ROW, CELL, NONE} grain_type;[23dint gridsize = 0;[25d//You definitely need locks to protect the grid because[26d//it is shared state accessed by read/write by all the threads[27dint grid[MAXGRIDSIZE][MAXGRIDSIZE];[30dint threads_left = 0;[31dtime_t start_t, end_t;[34dint PrintGrid(int grid[MAXGRIDSIZE][MAXGRIDSIZE], int gridsize)[35d{[36d int i;[37;3Hint j;[39;3Hfor (i = 0; i < gridsize; i++)[40;3H{[41d for (j = 0; j < gridsize; j++)[42;7Hfprintf(stdout, "%d\t", grid[i][j]);[43;5Hfprintf(stdout, "\n");[44;3H}[45dreturn 0;[46d}[49dlong InitGrid(int grid[MAXGRIDSIZE][MAXGRIDSIZE], int gridsize)[50d{[51d int i;[52;3Hint j;[53;3Hlong sum = 0;[54;3Hint temp = 0;[56;3Hsrand( (unsigned int)time( NULL ) );[59;3Hfor (i = 0; i < gridsize; i++)[60;5Hfor (j = 0; j < gridsize; j++) {[61;110H(B[0;7m[ Read 204 lines ][62d^G(B[m Get Help[62;40H(B[0;7m^O(B[m WriteOut[62;79H(B[0;7m^R(B[m Read File[62;118H(B[0;7m^Y(B[m Prev Page[62;157H(B[0;7m^K(B[m Cut Text[62;196H(B[0;7m^C(B[m Cur Pos[63d(B[0;7m^X(B[m Exit[63;40H(B[0;7m^J(B[m Justify[63;79H(B[0;7m^W(B[m Where Is[63;118H(B[0;7m^V(B[m Next Page[63;157H(B[0;7m^U(B[m UnCut Text[63;196H(B[0;7m^T(B[m To Spell[3d[4d[5d[6d[7d[8d[9d[10d[11d[12d[13d[14d[15d[16d[17d[18d[19d[20d[21d[22d[23d[24d[25d[26d[27d[28d[61d[K[29d[30d[61;91H(B[0;7m[ line 28/205 (13%), col 1/22 (4%), char 477/3738 (12%) ][30d(B[m[62d[J[63;237H[63;1H[?1049l[?1l>bash-4.2$ clear[K[K[K[K[Knano 01_gridapp_nolocking.c [C[C[C[C[C[C[C[C[C[Cls[Kgcc 01_gridapp_nolocking.c -o gridapp
+/tmp/ccF2q9QP.o: In function `main':
+01_gridapp_nolocking.c:(.text+0x48c): undefined reference to `pthread_create'
+01_gridapp_nolocking.c:(.text+0x4ce): undefined reference to `pthread_detach'
+collect2: error: ld returned 1 exit status
+bash-4.2$ gcc 01_gridapp_nolocking.c -o gridapp[C[1@ [1@-[1@p[1@t[1@h[1@r[1@e[1@a[1@d
+bash-4.2$ ./gridapp 
+Format:  gridapp gridSize numThreads
+bash-4.2$ ./gridapp 10 3
+Initial Grid:
+
+0	63	0	26	82	69	9	96	4	2	
+33	80	9	4	59	89	45	42	19	71	
+80	48	79	97	31	11	71	17	3	94	
+49	4	57	1	82	39	70	91	88	26	
+93	21	59	54	25	18	96	71	60	15	
+94	93	63	73	90	46	36	13	63	40	
+8	64	96	17	65	78	9	87	70	97	
+66	15	70	25	70	48	43	66	71	56	
+81	65	49	96	90	91	94	27	5	9	
+67	65	26	63	82	43	93	43	31	15	
+
+Initial Sum:  5219
+Executing threads...
+
+Final Grid:
+
+8	4	0	9	82	43	1	49	54	66	
+33	9	87	78	70	26	70	56	19	17	
+80	89	79	4	31	96	71	17	3	42	
+65	82	57	94	9	39	45	70	91	26	
+93	80	49	69	97	18	96	94	63	15	
+63	65	93	73	59	46	36	0	4	66	
+13	63	97	96	65	11	96	90	90	26	
+59	93	71	25	27	40	43	48	87	21	
+81	70	2	9	15	91	25	88	5	15	
+67	94	63	60	71	31	48	64	43	82	
+
+
+Final Sum:  5235
+DATA INTEGRITY VIOLATION!!!!!
+Secs elapsed:  20
+bash-4.2$ ./gridapp 10 3[K10 3[K[K0 1
+Grid size must be between 1 and 10.
+bash-4.2$ ./gridapp 100 1[K[K[K 1
+Initial Grid:
+
+97	4	36	4	59	19	42	86	45	25	
+4	23	35	49	66	95	97	82	23	94	
+30	71	46	95	45	31	37	63	66	75	
+1	63	31	37	68	90	56	10	29	53	
+35	33	76	22	35	94	17	32	77	92	
+78	59	16	24	6	61	8	43	24	74	
+19	77	89	2	14	9	93	22	71	74	
+75	6	59	4	80	94	50	50	26	27	
+94	4	39	10	81	97	23	89	41	0	
+15	12	77	56	14	44	66	59	66	37	
+
+Initial Sum:  4753
+Executing threads...
+
+Final Grid:
+
+22	74	36	4	14	19	42	86	45	25	
+4	23	35	4	8	95	97	94	23	94	
+30	71	46	95	45	31	37	63	66	75	
+1	63	92	37	59	90	56	10	29	53	
+35	33	76	61	10	94	17	32	77	31	
+78	4	16	89	68	22	66	43	24	9	
+56	80	24	2	77	49	93	97	71	74	
+75	6	0	59	14	94	50	50	26	27	
+82	4	39	35	81	97	23	89	41	6	
+15	12	59	19	59	44	66	77	66	37	
+
+
+Final Sum:  4753
+DATA INTEGRITY MAINTAINED!!!!!
+Secs elapsed:  20
+bash-4.2$ wget https://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/02_gridapp_wholegrid.c
+--2021-02-24 14:33:02--  https://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/02_gridapp_wholegrid.c
+Resolving lin-web.clarkson.edu (lin-web.clarkson.edu)... 128.153.4.74
+Connecting to lin-web.clarkson.edu (lin-web.clarkson.edu)|128.153.4.74|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 4191 (4.1K) [text/plain]
+Saving to: ‘02_gridapp_wholegrid.c’
+
+ 0% [                                                                                                                                                                                                    ] 0           --.-K/s              100%[===================================================================================================================================================================================================>] 4,191       --.-K/s   in 0s      
+
+2021-02-24 14:33:02 (226 MB/s) - ‘02_gridapp_wholegrid.c’ saved [4191/4191]
+
+bash-4.2$ wget https://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/02_gridapp_wholegrid.c[C[C[C[C[C[C[C[C[C[C./gridapp 10 1[K0 1[1P 3[Kgcc -pthread 01_gridapp_nolocking.c -o gridapp[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[1P[1@2
+gcc: error: 02_gridapp_nolocking.c: No such file or directory
+gcc: fatal error: no input files
+compilation terminated.
+bash-4.2$ gcc 02_gridapp_nolocking.c -o gridapp[1P[1P[1P[1P[1P[1P[1P[1P[1P[1@w[1@h[1@o[1@l[1@e[1@g[1@r[1@i[1@d
+/tmp/ccOxJmbN.o: In function `main':
+02_gridapp_wholegrid.c:(.text+0x513): undefined reference to `pthread_create'
+02_gridapp_wholegrid.c:(.text+0x555): undefined reference to `pthread_detach'
+collect2: error: ld returned 1 exit status
+bash-4.2$ gcc 02_gridapp_wholegrid.c -o gridapp[1@-[1@p[1@t[1@h[1@r[1@a[1@d[1P[1P[1@e[1@a[1@d[1@ 
+bash-4.2$ gcc -pthread 02_gridapp_wholegrid.c -o gridapp[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cnolocking[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cwget https://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/02_gridapp_wholegrid.c[C[C[C[C[C[C[C[C[C[C./gridapp 10 1[K[C[C[C[C[C[C[C[C[C[Cwget https://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/02_gridapp_wholegrid.c[C[C[C[C[C[C[C[C[C[C[42Pgcc 02_gridapp_nolocking.c -o gridappwholegrid[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9@-pthread [C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Knano 02_gridapp_wholegrid.c 
+[?1049h[1;63r(B[m[4l[?7h[?12l[?25h[?1h=[?1h=[?1h=[39;49m[39;49m(B[m[H[2J(B[0;7m  GNU nano 2.3.1                                                              File: 02_gridapp_wholegrid.c                                                                                                                                   [3;1H(B[m//[4d//  gridapp.c[5d//  CS444 Grid Locking[7d#include <stdio.h>[8d#include <stdlib.h>[9d#include <time.h>[10d#include <unistd.h>[11d#include <pthread.h>[12d#include <errno.h>[15d#define MAXGRIDSIZE   20[16d#define MAXTHREADS  1000[17d#define NO_SWAPS  20[19dextern int errno;[21dtypedef enum {GRID, ROW, CELL, NONE} grain_type;[23dint gridsize = 0;[25d//You definitely need locks to protect the grid because[26d//it is shared state accessed by read/write by all the threads[27dint grid[MAXGRIDSIZE][MAXGRIDSIZE];[30dint threads_left = 0;[31dtime_t start_t, end_t;[32dpthread_mutex_t lock;[35dvoid init_locks(){[36;3Hif (pthread_mutex_init(&lock, NULL)!=0)[37;5Hperror("mutex_init() failed");[38d}[40dvoid free_locks(){[41;3Hif (pthread_mutex_destroy(&lock) !=0)[42;5Hperror("mutex_destroy() failed");[43d}[45dint PrintGrid(int grid[MAXGRIDSIZE][MAXGRIDSIZE], int gridsize)[46d{[47d int i;[48;3Hint j;[50;3Hfor (i = 0; i < gridsize; i++)[51;3H{[52d for (j = 0; j < gridsize; j++)[53;7Hfprintf(stdout, "%d\t", grid[i][j]);[54;5Hfprintf(stdout, "\n");[55;3H}[56dreturn 0;[57d}[60dlong InitGrid(int grid[MAXGRIDSIZE][MAXGRIDSIZE], int gridsize)[61;110H(B[0;7m[ Read 222 lines ][62d^G(B[m Get Help[62;40H(B[0;7m^O(B[m WriteOut[62;79H(B[0;7m^R(B[m Read File[62;118H(B[0;7m^Y(B[m Prev Page[62;157H(B[0;7m^K(B[m Cut Text[62;196H(B[0;7m^C(B[m Cur Pos[63d(B[0;7m^X(B[m Exit[63;40H(B[0;7m^J(B[m Justify[63;79H(B[0;7m^W(B[m Where Is[63;118H(B[0;7m^V(B[m Next Page[63;157H(B[0;7m^U(B[m UnCut Text[63;196H(B[0;7m^T(B[m To Spell[3d[4d[5d[6d[7d[8d[9d[10d[11d[12d[13d[14d[15d[16d[17d[18d[19d[20d[21d[22d[23d[24d[25d[26d[27d[28d[61d[K[29d[30d[31d[32d[33d[34d[35d[36d[37d[38d[39d[40d[41d[42d[43d[44d[45d[46d[47d[48d[49d[50d[51d[52d[53d[54d[55d[56d[57d[58d[59d[60d7[3;61r8[61d[30S[1;63r[31;1H{[32d int i;[33;3Hint j;[34;3Hlong sum = 0;[35;3Hint temp = 0;[37;3Hsrand( (unsigned int)time( NULL ) );[40;3Hfor (i = 0; i < gridsize; i++)[41;5Hfor (j = 0; j < gridsize; j++) {[42;7Htemp = rand() % 100;[43;7Hgrid[i][j] = temp;[44;7Hsum = sum + temp;[45;5H}[47;3Hreturn sum;[49d}[51dlong SumGrid(int grid[MAXGRIDSIZE][MAXGRIDSIZE], int gridsize)[52d{[53d int i;[54;3Hint j;[55;3Hlong sum = 0;[58;3Hfor (i = 0; i < gridsize; i++){[59;5Hfor (j = 0; j < gridsize; j++) {[60;7Hsum = sum + grid[i][j];[31d[32d[33d[34d[35d[36d[37d[38d[39d[40d[41d[42d[43d[44d[45d[46d[47d[48d[49d[50d[51d[52d[53d[54d[55d[56d[57d[58d[59d[60d7[3;61r8[61d[30S[1;63r[31;5H}[32;3H}[33dreturn sum;[35d}[37dvoid* do_swaps(void* args)[38d{[40d int i, row1, column1, row2, column2;[41;3Hint temp;[42;3Hgrain_type* gran_type = (grain_type*)args;[45;3Hpthread_mutex_lock(&lock);[46;3Hthreads_left++;[47;3Hpthread_mutex_unlock(&lock);[50;3Hfor(i=0; i<NO_SWAPS; i++)[51;3H{[52d row1 = rand() % gridsize;[53;5Hcolumn1 = rand() % gridsize;[54;5Hrow2 = rand() % gridsize;[55;5Hcolumn2 = rand() % gridsize;[57;5Hpthread_mutex_lock(&lock);//[59;5Htemp = grid[row1][column1];[60;5Hsleep(1);[31d[32d[33d[34d[35d[36d[37d[38d[39d[40d[41d[42d[43d[44d[45d[46d[47d[48d[49d[50d[51d[52d[53d[54d[55d[56d[57d[58d[59d[60d7[2;61r8[61d[30S[1;63r[2;1H[K[31;5Hgrid[row1][column1]=grid[row2][column2];[32;5Hgrid[row2][column2]=temp;[34;5Hpthread_mutex_unlock(&lock);//[35;3H}[37dpthread_mutex_lock(&lock);[38;3Hthreads_left--;[39;3Hpthread_mutex_unlock(&lock);[41;3Hif (threads_left == 0){  /* if this is last thread to finish*/[42;5Htime(&end_t);[42;27H/* record the end time*/[43;3H}[44dreturn NULL;[45d}[50dint main(int argc, char **argv)[51d{[53d int nthreads = 0;[54;3Hpthread_t threads[MAXTHREADS];[55;3Hgrain_type rowGranularity = NONE;[56;3Hlong initSum = 0, finalSum = 0;[57;3Hint i;[60;3Hif (argc > 2)[31d[32d[33d[34d[35d[36d[37d[38d[39d[40d[41d[42d[43d[44d[45d[46d[47d[48d[49d[50d[51d[52d[53d[54d[55d[56d[57d[58d[59d[60d7[3;61r8[61d[30S[1;63r[31;3H{[32d gridsize = atoi(argv[1]);[33;5Hif (gridsize > MAXGRIDSIZE || gridsize < 1)[34;5H{[35d printf("Grid size must be between 1 and 10.\n");[36;7Hreturn(1);[37;5H}[38dnthreads = atoi(argv[2]);[39;5Hif (nthreads < 1 || nthreads > MAXTHREADS)[40;5H{[41d printf("Number of threads must be between 1 and 1000.");[42;7Hreturn(1);[43;5H}[44;3H}[45delse[46;3H{[47d printf("Format:  gridapp gridSize numThreads\n");[48;5Hreturn(1);[49;3H}[51dprintf("Initial Grid:\n\n");[52;3HinitSum =  InitGrid(grid, gridsize);[53;3HPrintGrid(grid, gridsize);[54;3Hprintf("\nInitial Sum:  %ld\n", initSum);[55;3Hprintf("Executing threads...\n");[57;3Hinit_locks();[59;3H/* better to seed the random number generator outside[60;6Hof do swaps or all threads will start with same[31d[32d[33d[34d[35d[36d[37d[38d[39d[40d[41d[42d[43d[44d[45d[46d[47d[48d[49d[50d[51d[52d[53d[54d[55d[56d[57d[58d[59d[60d7[2;61r8[61d[30S[1;63r[2;1H[K[31;6Hchoice[32;3H*/[33dsrand((unsigned int)time( NULL ) );[35;3Htime(&start_t);[36;3Hfor (i = 0; i < nthreads; i++)[37;3H{[38d if (pthread_create(&(threads[i]), NULL, do_swaps, (void *)(&rowGranularity)) != 0)[39;5H{[40d perror("thread creation failed:");[41;7Hexit(-1);[42;5H}[43;3H}[46dfor (i = 0; i < nthreads; i++)[47;5Hpthread_detach(threads[i]);[50;3Hwhile (1)[51;3H{[52d sleep(2);[54;5Hif (threads_left == 0)[55;7H{[56d	fprintf(stdout, "\nFinal Grid:\n\n");[57;9HPrintGrid(grid, gridsize);[58;9HfinalSum = SumGrid(grid, gridsize);[59;9Hfprintf(stdout, "\n\nFinal Sum:  %ld\n", finalSum);[60;9Hif (initSum != finalSum){[31d[32d[33d[34d[35d[38d[39d[43d[44d[45d[46d[47d[48d[49d[50d[51d[52d[53d[54d[55d[56d[57d[58d[59d[60d7[2;61r8[61d[30S[1;63r[2;1H[K[31;11Hfprintf(stdout,"DATA INTEGRITY VIOLATION!!!!!\n");[32;9H} else {[33;11Hfprintf(stdout,"DATA INTEGRITY MAINTAINED!!!!!\n");[34;9H}[35d	fprintf(stdout, "Secs elapsed:  %g\n", difftime(end_t, start_t));[36;9Hfree_locks();[37;9Hexit(0);[38;7H}[39;3H}[42dreturn(0);[44d}[31d[32d[33d[34d[35d[36d[37d[38d[39d[40d[61;90H(B[0;7m[ line 218/223 (97%), col 1/3 (33%), char 4167/4191 (99%) ][40d(B[m[62d[J[63;237H[63;1H[?1049l[?1l>bash-4.2$ nano 02_gridapp_wholegrid.c [C[C[C[C[C[C[C[C[C[Cgcc -pthread 02_gridapp_wholegrid.c -o gridapp[C[C[C[C[C[C[C[C[C[C[C[C[C[C[9P[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cnolocking[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cwget https://lin-web.clarkson.edu/~jmatthew/os/labs/lab6/02_gridapp_wholegrid.c[C[C[C[C[C[C[C[C[C[C./gridapp 10 1[K[K5
+Initial Grid:
+
+41	71	38	8	19	91	64	32	79	84	
+37	49	90	6	8	75	61	70	37	49	
+30	6	84	22	83	34	51	31	59	52	
+0	52	75	39	61	47	30	25	79	62	
+61	68	63	4	74	72	79	88	94	69	
+89	24	27	73	46	11	8	98	94	19	
+2	95	72	78	86	33	25	16	10	56	
+30	24	77	94	28	51	66	59	91	60	
+80	80	36	60	6	82	23	14	32	17	
+85	87	12	9	65	50	94	42	67	5	
+
+Initial Sum:  5091
+Executing threads...
+
+Final Grid:
+
+2	24	6	8	87	62	22	6	94	80	
+33	95	52	94	52	25	0	47	32	56	
+69	30	84	70	73	19	77	98	46	14	
+61	78	64	39	72	86	30	85	83	9	
+6	68	16	4	74	31	79	72	66	49	
+25	27	75	79	71	90	19	37	91	41	
+34	94	23	89	88	49	37	51	10	65	
+61	24	12	84	80	28	5	59	91	42	
+8	67	36	60	61	8	30	82	60	17	
+50	63	11	59	38	75	79	32	94	51	
+
+
+Final Sum:  5091
+DATA INTEGRITY MAINTAINED!!!!!
+Secs elapsed:  100
+bash-4.2$ ./gridapp 10 5[K1
+Initial Grid:
+
+17	95	98	19	14	82	19	43	72	23	
+77	80	52	90	83	91	77	16	1	77	
+8	52	81	88	23	36	22	21	21	39	
+80	38	86	78	58	52	12	29	95	85	
+52	24	17	4	14	0	96	43	69	49	
+21	29	1	2	70	76	90	92	49	11	
+83	30	2	69	60	60	21	73	89	69	
+10	41	93	27	98	60	79	94	3	0	
+43	24	82	97	78	52	25	21	96	75	
+32	80	57	86	1	17	46	23	90	87	
+
+Initial Sum:  5112
+Executing threads...
+
+Final Grid:
+
+90	72	80	19	14	82	52	43	77	23	
+77	80	19	17	83	91	77	79	82	87	
+38	12	81	10	98	36	22	21	21	80	
+1	8	86	78	58	52	52	43	95	85	
+69	24	86	4	14	0	96	43	69	49	
+21	29	1	2	70	39	90	92	49	11	
+83	30	2	52	60	60	21	73	1	69	
+88	41	93	27	23	75	16	94	3	0	
+29	24	89	97	78	52	25	21	96	60	
+32	98	57	17	76	17	46	23	90	95	
+
+
+Final Sum:  5112
+DATA INTEGRITY MAINTAINED!!!!!
+Secs elapsed:  20
+bash-4.2$ ./gridapp 10 15[K10
+Initial Grid:
+
+68	11	82	91	45	69	59	29	88	12	
+26	69	42	80	98	30	53	24	25	55	
+8	38	70	37	38	41	37	71	32	80	
+82	52	91	64	95	88	33	54	18	73	
+67	96	42	9	28	92	92	34	17	17	
+41	77	7	11	14	97	4	3	69	88	
+83	51	40	27	67	35	15	0	90	85	
+26	9	82	68	70	62	13	62	96	30	
+31	37	7	39	48	73	88	4	28	57	
+92	11	60	32	38	27	20	6	80	62	
+
+Initial Sum:  4914
+Executing threads...
+^C
+bash-4.2$ ./gridapp 10 10[C[C[C[K[K3[1P 3[1P 32 3
+Initial Grid:
+
+88	90	
+11	13	
+
+Initial Sum:  202
+Executing threads...
+
+Final Grid:
+
+88	90	
+11	13	
+
+
+Final Sum:  202
+DATA INTEGRITY MAINTAINED!!!!!
+Secs elapsed:  60
+bash-4.2$ exit
+exit
+
+Script done on Wed 24 Feb 2021 02:44:08 PM EST

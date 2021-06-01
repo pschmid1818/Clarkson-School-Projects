@@ -1,0 +1,27 @@
+Left_Max=5 Right_Max=20 Num_Lists=25
+
+[Thread rt_22]: Average of square roots (3 to 16) = 3.0039273598406786
+[Thread rt_12]: Average of square roots (1 to 8) = 2.038250065754465
+[Thread rt_15]: Average of square roots (2 to 9) = 2.2882500657544647
+[Thread rt_0]: Average of square roots (4 to 15) = 3.0269110191833857
+[Thread rt_10]: Average of square roots (0 to 11) = 2.1487419147132916
+[Thread rt_13]: Average of square roots (0 to 10) = 2.0425707442003724
+[Thread rt_9]: Average of square roots (1 to 13) = 2.527273528243173
+[Thread rt_1]: Average of square roots (3 to 11) = 2.5967432682429337
+[Thread rt_23]: Average of square roots (3 to 9) = 2.413112423380375
+[Thread rt_20]: Average of square roots (0 to 8) = 1.8117778362261912
+[Thread rt_16]: Average of square roots (3 to 9) = 2.413112423380375
+[Thread rt_2]: Average of square roots (4 to 19) = 3.3154735929048904
+[Thread rt_19]: Average of square roots (1 to 13) = 2.527273528243173
+[Thread rt_18]: Average of square roots (2 to 15) = 2.8192283285816138
+[Thread rt_24]: Average of square roots (4 to 16) = 3.101764017707741
+[Thread rt_17]: Average of square roots (4 to 17) = 3.1747169897013063
+[Thread rt_21]: Average of square roots (2 to 8) = 2.1865715037193882
+[Thread rt_4]: Average of square roots (3 to 12) = 2.6834791029324156
+[Thread rt_3]: Average of square roots (4 to 9) = 2.5266226926822912
+[Thread rt_5]: Average of square roots (3 to 7) = 2.2126719677832867
+[Thread rt_6]: Average of square roots (1 to 9) = 2.1451111695595246
+[Thread rt_7]: Average of square roots (0 to 14) = 2.439747550262346
+[Thread rt_14]: Average of square roots (4 to 14) = 2.9499953530902916
+[Thread rt_8]: Average of square roots (0 to 6) = 1.5474031557464198
+[Thread rt_11]: Average of square roots (0 to 12) = 2.249923430130558

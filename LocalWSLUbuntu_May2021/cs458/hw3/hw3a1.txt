@@ -1,0 +1,55 @@
+output: (run using https://compsys-tools.ens-lyon.fr/z3/index.php)
+        (rearanged output to put inv functions after mains)
+sat
+(model 
+  (define-fun c ((x!1 name)) camera
+    (ite (= x!1 adam) casio
+    (ite (= x!1 audrey) polariod
+    (ite (= x!1 cynthia) kodak
+    (ite (= x!1 kassandra) cannon
+      casio)))))
+  (define-fun cinv ((x!1 camera)) name
+    (ite (= x!1 casio) adam
+    (ite (= x!1 cannon) kassandra
+    (ite (= x!1 polariod) audrey
+    (ite (= x!1 kodak) cynthia
+      adam)))))
+
+  (define-fun m ((x!1 name)) Int
+    (ite (= x!1 adam) 3
+    (ite (= x!1 audrey) 2
+    (ite (= x!1 cynthia) 1
+    (ite (= x!1 kassandra) 4
+      3)))))
+  (define-fun minv ((x!1 Int)) name
+    (ite (= x!1 3) adam
+    (ite (= x!1 2) audrey
+    (ite (= x!1 1) cynthia
+    (ite (= x!1 4) kassandra
+      adam)))))
+
+  (define-fun b ((x!1 name)) browser
+    (ite (= x!1 adam) ie
+    (ite (= x!1 audrey) safari
+    (ite (= x!1 cynthia) firefox
+    (ite (= x!1 kassandra) opera
+      ie)))))
+  (define-fun binv ((x!1 browser)) name
+    (ite (= x!1 safari) audrey
+    (ite (= x!1 firefox) cynthia
+    (ite (= x!1 opera) kassandra
+    (ite (= x!1 ie) adam
+      audrey)))))
+)
+
+All the functions and their inverses match up and each is unique.
+megapixels -> 1.8 = 1, 3.2 = 2, 4.0 = 3, 7.0 = 4
+browsers -> ie = internet explorer
++------------+-----------+-------------------+----------+
+| megapixels | names     | browsers          | cameras  |
++------------+-----------+-------------------+----------+
+| 4.0        | adam      | internet explorer | casio    |
+| 3.2        | audrey    | safari            | polariod |
+| 1.8        | cynthia   | firefox           | kodak    |
+| 7.0        | kassandra | opera             | cannon   |
++------------+-----------+-------------------+----------+

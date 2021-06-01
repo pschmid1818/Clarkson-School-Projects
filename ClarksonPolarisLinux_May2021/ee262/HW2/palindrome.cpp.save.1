@@ -1,0 +1,27 @@
+#include<iostream>
+#include<cstring>
+using namespace std;
+
+int main(int cllength, char *clinput[])
+{
+	
+	const char* input=clinput[cllength-1];
+	
+	string strinput(input);
+	string test = strinput;
+	
+	int length = strinput.length();
+	int c = length;
+	int count = 0;
+
+	while (c>=0 && c<=length)
+	{
+		test[count]=input[c];
+		count++;
+		c--;
+	}
+	cout <<length <<endl;
+	cout <<test <<endl;
+	return 0;
+}
+

@@ -1,0 +1,1329 @@
+-----------------------------------------------------------------------------------------------------------------------
+TEST INFORMATION
+-----------------------------------------------------------------------------------------------------------------------
+- online test
+- during class time
+- moodle quiz
+- There shouldn't be any lab questions
+- compare and contrast style questions
+- less memorization
+- some short answer
+
+-----------------------------------------------------------------------------------------------------------------------
+TEST REVIEW
+-----------------------------------------------------------------------------------------------------------------------
+
+---- Slideset 1 - What is an OS ---------------------------------------------------------------------------------------
+
+    What is an OS?
+        - An operating system is a sftware layer that                                                 Applications      v
+            + manages hardware resources                                                              Operating Systems -
+            + provides an abstraction of the underlying hardware that is easier to program and use    Hardware          ^
+        - An OS is not 
+            + A compiler, Standard Libraries, Command Shells
+            + While closely related, they are not part of the OS
+
+    Benifits:
+        - The operating system abstracts the hardware
+            + details of the raw hardware are hidden so applications can be simplier & smaller
+            + faster access to the hardware
+            + application writers can program to a simpler and more portable "virtual machine"
+        - Providing useful logical abstractions
+            + new types of logical resources like sockets, pipes, and files systems
+        - Protecting applications from one another
+            + Enforce "fair" allocation of hardware resources among applications
+            + Policies that say what is "fair: and mechanisms to enforce it
+        - Supporting communication and coodination among applications
+            + Support abstractions through wich different applications can share data and notify each other of events
+
+    OS Issues: 
+        - Concurencey 
+            + How many types of activties can occor at once
+        - Protection
+            + What is granularity at which permissions to access various resources are granted
+            + How do you verify an entity's right to access a resource
+        - Fault Tolerance
+            + How do we deal with faults in applications? In devices? In our own OS code?
+        - Resource/services Provided to applications
+            + Does the OS offer Kernal support for events? Signals? Threads? Pipes? Shared Memory?
+        - Naming
+            + How does the application refer to and request the resoruces they want for themselves? Resources they want to share with others?
+        - Sharing
+            + What objects can be shared among applications? What is the granularity of sharing?
+        - Resource Allocation and Tracking
+            + What is the unit[s] of resource allocation
+            + Can we track (and bill for) resource usage?
+
+    OS Goals: 
+        - Abstract the raw hardware
+        - Protect apps from one another
+        - Not allow for applications to monopolize more than their fair share of system resoruces
+        - Provide desired functionality
+        - Expose the raw capability of the hardawre, minimizing the "tax"
+        - Optimize for the expected workload
+        - Be simple enough that the code executes quickly and can be debugged easily 
+    
+---- Slideset 2 - History ---------------------------------------------------------------------------------------------
+    
+    At first OSes were just shared libraries:
+        - Each programmer didn't need to write a code to manage each devices
+        - Each application when complied contained the "os"
+        - Loaded memory by hand (by "operators") through mechanical switches
+        - Just one application at a time so no need for protection or sharing
+        - No virtual memory, application either fit into memory or it didn't or progammers moved sections in and out of memory by hand
+    
+    Batch Processing:
+        - Still only 1 app at a time
+        - OS, not operators, loaded jobs after one another using punch cards or tapes
+        - OS knew how to read the next job in, execute it and take back control when doesnt
+        - Operating system stayed in memopry permenantly
+        - Spooling
+            + Problem
+                - Card readers are slow
+                - time reading jobs from cards meant lost CPU time
+            + Solution
+                - Load next job into memory while executing current job
+    
+    Multiprogrammed Batch Systems:
+        - keep multiple jobs in memory at the same time and take turns on executions rather than running to completion
+            + Applications still cant communicate directly
+        - Able to overlap I/O of one app with another
+            + If one job requires I/O for on app, dont leave the CPU hanging, run something else
+            + While jobs took longer, the CPU was better utilized (They were very expensive so that was important)
+        - Requires some modern OS functionality: 
+            + simple cpu scheduler, memory management, memory and I/O protection, and asyncronous I/O
+            + Still far off though
+
+    Time Sharing: (i.e. CTSS, Multics, and UNIX)
+        - Interactive computing
+            + Connect to computer via dumb terminal (monitor, keyboard, serial connection to computer)
+            + Each interactive user fells like they have their own computer, but in reality, jobs are swapped on and off the CPU rapidly enough that users dont notice
+            + Enables interactive applications like editors, command shells, and even debugging running programs
+            + User interacts with jobs through its run time
+        - Scheduling
+            + Need to swap jobs on and off the CPU quickly so users dont notice
+            + Each job is given a time slice
+            + Batch scheduling was very difficult - let application run until it did some I/O then swap it out until its I/O is doesn
+            + Batch optimizes for throughput; Timesharing optimizes for response time
+        - Share File Systems
+            + Users login over a dumb terminal over a serial lines
+            + Command shells execute user command then wait for another
+            + Thus time sharing systems needed shared file systems that held commonmly used programs
+            + Users could login, run utilities, store inputs and output files in shared file systems
+        - Security 
+            + Batch only had applications and the inputs were fixed
+            + Time Sharing means multiple interactive userts which leads to increased threats
+
+    Personal Computers:
+        - Computers cheap enough that one can be dedicated to an individual
+        - First PC was the Altair in 1975
+        - 1975 -> 1980, may companies make PCs (or microcomputers) based on the 8080 chip
+            + Early computers mainly for hobbists, most run CP/M OS (Control Program Microcomputer)
+            + Closer to Batch than Time Sharing
+        - 1980, IBM gets into PC buisness
+            + uses intel 8080 hardware and Micorsoft's BASIC interpreter but needed an OS
+            + Microsoft purchaces QDOS (Quick and Dirty) and renamed it MS-DOS
+                - library linked in with applications
+                    + 1 M address space; apps only got 140K
+                - No memory protection (apps could do anything they want)
+                - No hierarical file system, single directory with at most 64 files
+        Windows:    
+            - 1985, Windows 1.0
+                + Runs as a library on top of DOS
+                + allowed useres to switch between several programs without requireing them to quit and restart
+            - 1987, Windows 2.0 
+                + allows overlapping windows
+            Split into 2 lines
+                - 1994, Windows NT
+                    + entirely new OS kernal (not DOS) designed for server machines
+                - 1995, Windows 95
+                    + Included MS-DOS 7.0 but after startup it took over completely
+                    + Pre-emptive multitasking, advanced files systems, threading, networking
+                - 2000, Windows 2000
+                    - upgrade to Windows NT code base
+                    - Designed to replace 95 and its DOS roots
+                - XP, Vista, 7, 8, 10, CE, Mobile
+        Linux:
+            - Created by a student based on a student operating systems called minux in 1991
+            - worked with newsgroup to develop open source OS to create a UNIX style OS for PCs
+            - Different distributions package the same Linux kernal with differnt open source softwares
+        PC-OSs meet Timesharing:
+            - Both Linux and later versions of windows brought advanced OS concepts to the desktop
+                + Multiprogramming for user multitasking
+                + Memory protection to protect against buggy applications
+                + PC-OSs allowed users to login remotely and multiple users to be running jobs
+            - Steady increase of hardware perfomance made this possible
+
+    Mobile/Cellphone OS:
+        -Apple iOS, Google Android, and Microsoft's Windows Phone OS
+            + Android uses Linux, iOS based off of MacOS
+        - Similar evolution to personal computers
+            + First one app at a time now can run amny apps at once
+            + stripped down protection and multiprogramming
+            + Dont log in as multiple users but for example Android installs each app as a different user for permissions and resoruces
+
+    Pararllel and Distributed computing
+        - Harness resoruces of multiple computer Systems
+            + Pararllel computing focuses on splitting up asingle task and getting speedup proportional to the number of machines
+            + Distributed computing focuses on harnessing resoruces from geographically dispersed machines
+            + Cloud computing - using resoruces in datacenters located elsewhere rather than local resoruces
+
+---- Slideset 3 - Processes ------------------------------------------------------------------------------------------- 
+
+    Programs vs Processes
+        - A program is a sequence of commands waiting to be run
+        - A process is active
+            + An instance of a program being executed
+            + There may be many processes running the same program
+            + also called a job or a task
+
+    - What makes up a process?
+        + Address space
+        + code
+        + data
+        + Stack (nesting of procedure calls made)
+        + Register values (Including the PC)
+        + Resources allocated to the process
+            - Memory, open files network connections
+        + Stack and heap grow
+
+    Address Space Map:
+        Biggest ^  +----------------------------------------+ <--- Sometimes reserved for OS
+        Virtual |  | Stack - Space for local variables etc. |
+        Address |  |         For each nested procedure call |
+                |  +----------------------------------------+ <--- Stack Pointer
+                |  |       |                  ^             | <--- Biggest area
+                |  |       V                  |             |      OS will typically stop you long before the stack and heap overlap but it can be changed  
+                |  +----------------------------------------+
+                |  | Heap - Space for dynamically allocated |
+                |  | memory (e.g. with malloc)              |
+                |  +----------------------------------------+
+                |  | Staticly Decalre Variables             |
+                |  | (Global Variables)                     |
+                |  +----------------------------------------+
+                |  | The Code                               | <--- PC
+                |  | Text segment                           |
+        0x0000  V  +----------------------------------------+ <--- Sometimes reserved for Error Catching
+
+    How is a process represented?
+        - Usually by a process or task object
+        - Process control Block
+        - When not running, OS has to remember Registers, statistics, Working directory, Open Files, 
+          Users who owns process, Timers, Parent Processes and Sibling process ids
+        - In linux, task_struct defined in include/linux/sched.h
+            + struct that store important info
+
+    Management of PCBs (Process control block)
+        - PCBs are datastructures
+        - Space for them may be dynamically allocated as needed or perhaps a fixed size array of PCBs 
+          for the maximum number of possible processes allocated at one time
+        - As a process is created, a PCB is assigned and initialized for it
+            + Often process id is an offet into an array of PCBs
+        - After process Terminates, PCB is freed
+            + Sometimes kept around for parent to retrive its exit status
+    
+    State Transition Diagram:
+                         Scedule/Unschedule
+        (New) -> (Ready) <----------------> (Running) -> (Terminated)
+                    ^                           |
+     Grant resource |                           | Request resource or service
+                    +---- (Wating) <------------+
+
+        New -> Ready          - Process created startes in Ready
+        Ready -> Running      - chosen to be scheduled on a processer
+        Running -> Terminated - Process exits or fails
+        Running -> Waiting    - Process requests resoruces from the OS
+        Running -> Ready      - Context switch off the CPU or yields the CPU
+        Wating -> Ready       - Resources granted, process able to run again when chosen
+
+    State Queues:
+        - OSs often maintain a number of queues of processes that represent the state of the processes
+            + All the runnable processes are linked together into one queue (or perhaps multiple based on priority)
+            + All the processes blocked (or perhaps bloced for a particular class of event) are linked together
+            + As a process changes state, it is unlinked from one queue into another
+
+    Context Switch:
+        - When a process is running, some of its state is stored directly in the CPU (Reg. values, etc.)
+        - When the OS stops a process, it must save all of this hardware state somewhere (PCB) so that it can be restored again
+        - The act of saving one processes hardware state and restoring another's is called a contex switch
+            + 100s or 1000s a second
+
+    CPU Scheduler:
+        - Selects which process should be executed next and allocates CPU
+        - Short term scheduler is invoked very frequently (milliseconds)
+
+    Cooperating Processes:
+        - Processes can run independantly of each other or processes can coordinate their activities with other processes
+        - To cooperate, processes must use OS facilities to communicate
+            + One example: parent process waits for a child
+            + Others: Files, Sockets, Pipes...
+
+    Signals:
+        - Processes can register to handle signals with the signal
+            + void signal (int signum, void (*proc) (int))
+        - Processes can send signals with the kill function
+            + kill (pidn signum)
+        - System defined signals like SIGHUP (0), SIGKILL (9), SIGSEGV (11)
+        - Signals not used by the system like SIGUSR1 and SIGUSR2
+
+    Orphaned processes:
+        - If a parent dies, child becomes a child of init
+        - But if the shild shares file handles with parent there can be trouble
+        - For a child to be an indepenedant adult ("demonized") it generally kills its parent
+        
+---- Slideset 4 - Kernel ---------------------------------------------------------------------------------------------- 
+
+    Day in the life of an OS:
+        - When a machine boots, the operating system will execute for some time to initalize the state of the machine
+          to start up certain processes
+        - Once initalizization is done, the OS only executes when some "event", like system call, occurs that requires 
+          its attention
+        - When an event occurs
+            + The current state of the machine is saved
+            + The mode changes to protected mode
+            + An event handler procedure is executed (must have a handler for every event)
+
+    Types of events:
+        - software event (often called exceptions)
+            + normal software requests for OS services are called "traps"
+            + Software errors that transfer control to the OS are called "faults"
+            + Sometimes system calls called software interrupts
+        - Hardware events (e.g. device notifies CPU that it has completed an I/O request)
+            + Sometimes say "trap to the OS" to handle hardware interrupt
+
+    OS initalizization:
+        - During the OS initalizization on INtel CPU:
+            + Interupt Descriptor Table (IDT) loaded with handlers for wach kind of interupt
+        - System call is interupt vector 128 (0x80)
+
+    Regaining the CPU:
+        - If a user level application is running on the CPU, what can the OS do to make it yeild the CPU after its turn
+            + Timer (clock) operation
+            + Timer generates interupts on a regular interval to transfer control back to the OS
+    
+    System Calls:
+        - If an application legitimatley needs to access a protected feature, it calls a system call
+            + System call instruction executed with a parameter that designates specific call and any other needed paremeters
+            + The state of the user program is saved so that it can be restored (context switch to the OS)
+            + Control is passed to an OS procedure to accomplish the task amd mode bit changed
+            + OS procedure runs for the user program but can verify the programs "rights" and refuse to do it
+            + On completion of the system call, the state of the user program including hr old mode bit is restored
+
+    System Call Illustrated:
+        File.open("/home/Readme")                               Resume application 
+            |                                               with file opened or error
+            V                                                           ^
+        SystemCall(SYS_OPEN,"/home/Readme")   User mode                 |
+            |                                                           |
+        ----+-----------------------------------------------------------+------
+            V                                                           |
+        Save user registers and mode         Kernal Mode                |
+        lookup SYS_OPEN in a table of                                   |
+        call procedures, change mode bit,                               |
+        jump to the kernelOpen procedure                                |
+            |                                                   Restore user mode
+            V                                                   and application's
+        kernelOpen("/home/Readme", application has rights) ---> registers etc.
+
+    Memory Protection:
+        - All codes executes on the CPU must be loaded into its memory
+            + Its executed by setting the program counter register to point to the location of the next instruction and execute
+        - OS has its code in memory and so does each runnable user process
+        - Give each process a contiguos set of memory addresses to use and deicate two registers to specifying the top
+          and the bottom of this region
+        - Memory protection hardware in reality is more powerful than base and limit registers (page tables, TLB, etc.)
+
+        +-----------+                       When Process 1 is executing, Base and limit set to point to process 1's memory region
+        |     OS    |                       if process 1 tries to load or store to addresses outside this region, then hardware
+        +-----------+ <- Base Registers     will transfer control to the OS
+        | Process 1 |
+        +-----------+ <- Limit Resisters
+        | Process 2 |
+        +-----------+
+
+---- Slideset 5 - Scheduling ------------------------------------------------------------------------------------------ 
+
+    Scheduler:
+        - A scheduler is the module tahat moves jobs from queue to queue
+        - Scheduler runs when
+            + A process/thread blocks on a request
+            + A timer interupt occurs
+            + A new process/thread is created or is terminated
+
+    Scheduling Algorithm:
+        - The sceduling algorithm examines the set of candidate processes/threads and chooses one to execute
+        - Sceduling algorithms can have different goals
+            + Maximize CPU utilization
+            + Maximize throughput
+            + Minimize average turnaround time (Avg(EndTime - StartTime))
+            + Minimize response time
+
+    - Starvation is a process being prevented from making progress beacuse another process hasa resource it needs
+        + Sceduling policies should try to prevent starvation
+
+    Types of Scheduling:
+        - To find best scheduler, think of a process/thread as an entity that alternates between two startes
+          using the CPU and waiting for I/O
+        - First Come First Serve (FCFS/FIFO)
+            + Also called First in First Out
+            + Jobs Sceduled in the order they arive
+            + When used, tends to be non-premptive
+                - If you get there first, you will get all the resoruces until youre done
+                - "Done" can mean completion or end of CPU burst
+            + Sounds Fair
+                - All Jobs Treated Equaly
+                - No Starvation (except for infinate loops that prevent completion)
+            + Cons
+                - Can Lead to poor overlap of I/O and CPU
+                    + If left First in line will run until they are done or block for I/O then can get oncvoy effect
+                    + While job with long CPU burst executes, other jobs complete their I/O and the I/O devices sit 
+                      idle even though they are the bottleneck resource and should always be kept busy
+                - Also small jobs wait behind long running jobs which results in high average turn around time
+
+        - Short Jobs First (SJF)
+            + To prevent short jobs waiting behind long ones, let the jobs with the shortest CPU burst go next
+                - Cant prive that this results in the optimal average wait time
+            + Can be preemptive or non-preemptive
+                - preemptive ones called shortest remaining time first
+            + Cons
+                - Starvation for long running jobs because they may never get to the front of the queue
+                - Can't really know if a job will have the shortest CPU burst
+
+        - Most Important Job First
+            + Priority scheduling
+                - Assign priority to jobs and run the job with the highest priority first
+                - Can be preemptive such that as soon as a high priority job arrives it gets the CPU 
+            + Can implement with multiple "Priority Queues" instead of a single ready queue
+                - Run all jobs on highest priority first
+            + Cons
+                - How are priorities decided?
+                    + SJF is priority scheduling based on run time
+                - Like SJF, starvation is possible
+                    + Possible solution, increase priority based on wait time, 
+                      eventually any job will accumulate enough "waiting points" to be scheduled
+                - How do you schedule when 2 processes have the same priority
+                - What if the highest priority needs the most resources 
+                - Priority inversion
+                    + lowest priority process holds a lock that the highest priority process needs.
+                      medium priority processes can run while low priority never gets a chance to releases lock
+                    + Solution is having the process with a lock be considered the highest priority process until 
+                      it releases it, then it reverts back to its original priority
+
+        - Round Robin (RR)
+            + Sceduling broken into time slices
+            + Each job gets its share of CPU for a slice of time
+            + No starvation
+            + Cons
+                - How do you choose the size of the time slice?
+                    + If too small, then spend all your time context switching and very little time making progress (Too much overhead)
+                    + If too big, then every other process has to wait between the times a given job is sceduled leading to poor response time
+                    + RR with too large time slice => FIFO
+                - No way to express priority
+                    + Some jobs should get longer slices
+
+        - Best of all Worlds?
+            + To create a realistic sceduling algorithm, combine elements from several of the basic schemes to ballance demands
+                + Have multiple queues
+                + Use different algorithms for different queues
+                + Use different algorithms between queues
+                + Have algorithms for moving jobs between queues
+                + Have different time slices for each queue
+                + Where do new jobs enter the system
+
+        - Multi-level Feedback Queue (MLFQ)
+            + Multiple queues representing different types of jobs
+                - I/O bound, CPU bound
+                - Queues have different priorities
+            + Jobs can move between queues based on execution history
+            + If any job can be guarenteed to make it to the top priority queue given enough time, then its starvation freed
+                - If enough time in low priority queue raises its effective priority
+
+            + Example MLFQ
+                - 3-4 classes spanning > 100 priority levels
+                    + timesharing, interactive, system, realtime (highest)
+                - Processes with the highest priority always run first; the same priority scheduled Round Robin
+                - Reward interactive behavior by increasing priority if process blocks before its time slice is up
+                - Punnish CPU hogs by decreasing priority of process uses its whole time slice
+        
+    nice:
+        - users can lower the priority of processes with nice
+        - root user can raise or lower the priority of the process
+    
+---- Slideset 6 - Threads ---------------------------------------------------------------------------------------------  
+
+    Why use > 1 sequential process:
+        - some problems are hard to solve as a single sequential process; easier to express as a colection of cooperating processes
+            + Hard to write code to manage many different tasks all at once
+            + Think of it like making a phone call while doing the dishes while looking through the mail
+            + Can't be indepenedent processes becuase shared data (brain) and shared resoruces (the kitchen and phone)
+            + Can't do them sequentially because need to make progress all at once
+            + Easier to write an algorithm for each and when there is a lull in one activity let the OS swicth between them
+        - Example: Webserver
+            + Listen for incoming socket requests
+                - Once it receives a request, it ignores listening to the incoming socket while it does the request
+                - Must do both at once
+            + A solution would be to create a child process to handle the request and allow the parent to return to listening
+                - This is inefficient due to address space creation (and memory usage) and PCB initalizization
+            + There are similarities between the processes that are spawned off to handle requests
+                - They sahre code, have the same privileges, share the same resoruces to return, cgi script to run, database to search
+            + But there are differences
+                - Operating on different requests
+                - Each one will be in different stages of the handle request algorithm
+            + Solution
+                - Let these tasks share the address space, privileges, and resoruces
+                - Give each their own registers (like the PC) their own stack etc.
+
+    single threaded process                  Multi threaded process
+    +------+------+-------+   +-----------+-----------+-----------+
+    | code | data | files |   |   code    |   code    |   code    |
+    +------+------+-------+   +-----------+-----------+-----------+
+    | registers   | stack |   | registers | registers | registers |
+    +-------------+-------+   |   stack   |   stack   |   stack   |
+    |      thread         |   +-----------+-----------+-----------+
+    |                     |   |  thread 1 |  thread 2 |  thread 3 |
+    +---------------------+   +-----------+-----------+-----------+
+
+    Processes vs Threads:
+        - Each thread belongs to one process
+        - One process may contain multiple threads
+        - Threads are the logical unit of scheduling
+            + PC, stack, local variables            
+        - Processes are the logaical unit of resource allocation
+            + address space, privileges, resoruces
+
+    Address Space Map for multithreaded program:
+        Biggest ^  +----------------------------------------+ 
+        Virtual |  | Thread 1 Stack - Variable declaration  |
+        Address |  +----------------------------------------+ <--- Stack Pointer (Thread 1)
+                |  |       |                       ^        |
+                |  |       V                       |        |
+                |  +----------------------------------------+
+                |  | Thread 2 Stack - Variable declaration  |
+                |  +----------------------------------------+ <--- Stack Pointer (Thread 2)
+                |  |       |                  ^    |        | 
+                |  |       V                  |    |        | 
+                |  +----------------------------------------+
+                |  | Heap - Space for dynamically allocated |
+                |  | memory (e.g. with malloc)              |
+                |  +----------------------------------------+
+                |  | Staticly Decalre Variables             |
+                |  | (Global Variables)                     |
+                |  +----------------------------------------+
+                |  | The Code                               | <--- PC (Thread 2)
+                |  | Text segment                           | <--- PC (Thread 1)
+        0x0000  V  +----------------------------------------+ 
+
+    Warning: threads can be dangerous!
+        - One can argure (and John Ousterhout did) that threads are a bad idea for most purposes
+        - Anything you can do with threads you can do with an event loops
+            + Remember "Make making phone call while doing dishes and looking at mail"
+        - Ousterhout said thread programming is hard to get right
+        - "Although threads seem to be a small step from sequential computation, 
+          in fact, they represent a huge step. They discard the most essential 
+          and appealing properties of sequential computation: understandability, 
+          predictability, and determinism. Threads, as a model of computation, are 
+          wildly nondeterministic, and the job of the programmer becomes one of pruning 
+          that nondeterminism." 
+                -- 'The Problem with Threads, Edward A. Lee
+
+    Kernel support for threads:
+        - Some OSes support the notion of multiple threads per processes and others do not
+        - Each user level thread can map to a kernel level thread (Called 1:1)
+        - When switch between threads don't have to flush TLB - do still have context switch overhead
+        - Even if no "kernel threads" can build threads at user level
+            + Each "multithreaded program gets a single kernel in the process
+            + During its timeslice, it runs code from its various threads
+
+    User level threads:
+        - User level thread switch must be programmed in assembly (restore values to registers, etc.)
+        - User level thread packages avoid having one thread monopolize the process timeslice by managing them like 
+          the OS manages processes on the CPU
+            + Solution 1: non-premptive
+                - Rely on each thread to periodically yeild
+                - yeild would call the sceduling function of the library
+            + Solution 2: OS is to user level thread package like hardware is to OS
+                - Ask OS for periodic timer signal
+                - Use that to gain control and switch the running thread
+
+    Kernel vs User level:
+        - One might think that kernel level are best and only if kernel soes not support threads use user level threads
+        - In fact, user level threads can be much faster 
+            + Thread Creation, "Context Switch" between threads, communication between threads all done at user level
+            + Procedure calls instead of system calls (verification of all user arguments, etc.) in all these cases
+        - Kernel level threads are slow due to having to swtich to kernel mode every switch 
+          (having to go through the process of saving etc.)
+            + Kernel level thread creation and joining - 94 ms
+            + User levele thread creation and joining - 4.5 ms
+        - With kernel level threads, kernel chooses among all possible threads to scedule
+        - With user level threads , kernel scedules the process and the user level thread package scedules the thread
+        - User level threads have benefit of fast context switch at user level
+        - Kernel level threads have benifit of global knowledge of sceduling choices and has more flexibility in assigning 
+          priorities to individual threads
+
+    Problems with user level threads:
+        - OS does not ahve information about thread activity and can make bad sceduling decisions
+        - Examples
+            + If thread blocks, the whole process blocks
+                - Kernel threads can take overlap I/O and computation within a process
+            + Kernel may scedule a process with all idle threads
+        - Possible solution: Scheduler Activations (M:N)
+            + If have user level thread support availible then use kernel threads *and* user-level threads
+            + Each Process requests a number of kernel threads to use for running user-level threads on
+            + Kernel procises to tell user level before it blocks a kernel thread so user-level thread package can choose what to do with the remaining kernel threads
+            + User level promises to tell kernel when it no longer needs a given kernel level thread
+
+---- Slideset 7 - Syncronization -------------------------------------------------------------------------------------- 
+ 
+    Concurency (Exeucting processes out of order) is a good thing:
+        - So far we have mostly talked about constructs to enable concurrency
+            + Multiple processes, inter-process communication
+            + Multiple threads in a process
+        - Concurencey critical to using the hardware devices to full capacity
+            + Always something that needs to be running on the CPU, using eac device, etc.
+        - We dont want to restrict concurency unless we absolutely have to (When to restrict concurencey)
+            + Some resoruce so heavily utilized that no one is getting any benifit from their small piece
+                - Too many processes wanting to use the CPU (while(1) fork())
+                - "Thrashing"
+                - Solution: Access Control (Starvation?)
+            + Two processes/threads we would like to execute concurrently are going to access the same data
+                - One writing the data while the other is reading; two writing over top at the same time
+                - Solution: Synchronization (Deadlock?)
+                - Synchronization primitives enable safe concurencey
+
+    Syncronization Required:
+        - Required for all shared data structures like:
+            + Shared Databases
+            + Global Variables
+            + Dynamically allocated structures (off the heap) like queues, lists, trees, etc.
+            + OS data structures like running queue, the process table
+        - What are not shared data structures?
+            + Variables local to the procedure (on the stack)
+            + Other bad things that happen if try to share pointer to a variable that is local to the procedure
+
+    Critical Section Problem:
+        - Model processes/threads as alternating between code that accesses shared data (critical section) and code that doesn not (remainder section)
+            do {
+                ENTRY SECTION
+                    critical section
+                EXIT SECTION
+                    remainder section
+            }
+        - ENTRY SECTION requests access to the shared data, EXIT SECTION notifies of completion of the critical section
+        - Solution:
+            + Mutual Exclusion
+                - Only one process is allowed to be in its critical section at once
+                - All other processes forced to wait on ENTRY
+                - When one process leaves, another may enter
+            + Progress
+                - If a process is in the critical section, it should not be able to stop another process from entering it indefinately
+                - Decision of who will be next cant be delayed indefinately
+                - Cant give one process access; cant deny access to everyone
+            + Bounded Waiting
+                - After a process has made a request to enter its critical section, there should be a bound on the number 
+                  of times other processes can enter their critical section
+
+    Syncronization Primitives:
+        - Used to implement a solution to the critical section problem
+        - OS uses Hardware Primitives
+            + Hardware test and set
+            + Disable interrupts
+        - OS exports primitives to user apps; User level can build more complex primitives from simpler OS primitives 
+          and some HW primitives
+            + Locks
+            + Semaphores
+            + Monitors
+            + Messages
+
+    Hardware Test and Set:
+        - Atomic operation that reads current value of a register, writes 1 to its location and returns the old value
+        - If a process is running a test and set, no others may begin another until the first is finished
+
+    Locks:
+        - Object with two operations, lock and unlock
+        - Threads use pairs of lock/unlock
+            + Lock before entering a critical section
+            + Unlock upon exiting a critical section
+            + If a thread is in their critical section, then the lock will not return until it can be acquired
+            + Between lock and unlock, a thread "holds" the lock
+        - Lock -> run critical section -> unlock -> another thread ready to do critical section ->
+        - Issues
+            + Forget lock? No exclusive access
+            + Forget unlock? Deadlock
+            + Put it in the wrong place?
+        - Implementing Locks
+            + Lock has critical section itself (read lock; if free, write lock taken)
+            + Need help from hardware
+                - Make a basic lock primitive using atomic instructions (like test-and-set, read-modify-write)
+                - Prevent context switched
+                    + Disable interrupts
+        - Spinlocks
+            + Uses a while loop to wait for a the lock to unlock with a test-and-set
+                - If the test-and-set returns 1, the lock is in use
+                - If the test-and-set returns 0, the lock is unlocked
+            + Wasteful of CPU time
+                - thread spinning still uses its full share of the cpu sycles waiting, called busy waiting
+                - During that time, thread holding the lock cannot make progress
+                - Waht if thread waiting has higher priority tahn the treads holding the lock
+            + Safe at user level but inefficient
+        - OS can build lock so when lock is called, if the process or thread dosent acquire the lock, it is taken off the ready queue 
+          into a special queue of processes that are waiting for the lock to be released
+            + When the lock is released, the OS chooses a waiting process to grant the lock to an place it back into the ready queue
+            + often called a semaphore
+
+    Semaphores:
+        - Just because comething is called a semaphore, doesnt make it one
+            + something called a semephore could implement lock or test-and-set
+        - Semaphore object has 2 data members: an int value and a queue of waiting processes
+        - Uses operations wait and signal
+            + Wait operation (like lock)
+                - decrements the semephore's integer value and blocks the thread calling wait until the semephore is availible
+                - also called P() after dutch word, proberen, to testg
+            + Signal operation (like unlock)
+                - Increments the semaphore's integer value and if threads are blocked waiting, allow onw to "enter" the semephore
+                - Also called V() after dutch word, verhogen, to increment
+            + Dutch because it was invented by a dutchman, Edgar Dykstra fot THE OS (strict layers) in 1968
+        -Binary semephore
+            + Semephor's value initialized to 1
+            + used to guarentee exclusive access to shared resource (functionaly like a lock but without the busy waiting)
+        - Counting semephore
+            + Semephore's value initialized to N>0
+            + Used to control access to a resource with N interchangable units availible (e.g. N processors)
+            + Allow threads to enter a semephore as long as sufficient resources are availible
+        - When value is > 0, semephore is open
+            + thrad calling wait will continue
+        - When value is <= 0, semephore is closed
+            + thread wait will decrement value and block
+        - When the value is negative, it tells how many threads are waiting on the semephore
+        - If the OS exports the semephore, the kernel is aware of the waiting queue
+        - If the user level thread package exports the semephore, then user level thread scheduler is aware of the waiting queue
+        - Busy waiting is not gone completely
+            + When accessing a semephore's critical section, thread holds the semephores lock and another process that tries 
+              to call wait or signal at the same time will busy wait
+            + Semephores critical section is normally much smaller than the section it is protecting, so the busy waiting is 
+              greatly reduced
+            + Boils down a long critical section into a short one - maximizes the time that parallelism is ok and minimize 
+              busy waiting
+
+    Are spin locks always bad?
+        - Adaptive locking in solaris
+        - Adaptive mutexes
+            + Multiprocessor system if cant get lock
+                - And thread with lock is not running, then sleep
+                - And thread with lock is running, then spin wait
+            + Uniprocessor if cant get lock
+                - Immediatley sleep (no hope for lock to be released while its running)
+        - Programmers choose adaptive mutexes for short coed segments and semephores or condition variables for longer ones
+        - Blocked threads placed on a seperate queue for desired object
+            + Thread to gain access next chosen by priority and priority inversion is implemented
+
+---- Slideset 8 - Syncronization 2 ------------------------------------------------------------------------------------ 
+    
+    Problems with locks and semephores:
+        - No syntatic connection between lock/semephore and the shared data/resources being protected
+            + Thus the meaning of the semephores is defined by the programmer's use of it
+                - Semephores are basically global variables accessed by all threads
+            + Easy for programmers to make a mistake
+        - No seperation between use for mutual exclusion and use for resource management and use for expresing sceduling 
+          constraints
+        - Add languge support for synchronization
+            + Delcare a section of code to require mutually exclusive access
+            + Associate the shared data itself wit hthe locking automatically
+        - A Monitor is programming language support to enforce yncronization
+            + mutual exclusion code added by the comiler
+
+    Monitors:
+        - A monitor is a software module that encapsulates
+            + Shared data structures
+            + Procedures that operated on them
+            + Synchronization required of processes that invoke these procedures
+        - Like a public/private data interface prevents access to private data members; 
+          monitors prevent unsynchronized access to shared data structures
+        - Can implement semephores with monitors and monitors with semephores
+    
+    Condition Variables:
+        - Have 2 operations, wait and signal (like semephores)
+            + x.wait() mains the process invoking this operation is suspended until another process invokes x.signal()
+            + The operation wait allows another process to enter the monitor
+            + The x.signal operation resumes exactly 1 suspended process 
+                -If no processes is suspended, then it has no effect (unlike semephores)
+        - If thread monitor calls x.signal waking another thread, then whos is running on the monitor now?
+            + Run akaened thread next; signaler blocks
+            + Waiter is made ready; signaler continues
+        - Can use without a monitor
+            + Basicly just a semaphore without a history
+            + Couldnt do locking with it beause no mutual exclusion on its own
+            + Couldnt do resource management because no value/history
+            + Can use it for ordering/sceduling constraints
+        
+    Events/Messages:
+        - Expreses ordering between two actions
+        - Windows Events
+            + Synchronization objetcs used somewhat like semephores when they are used for ordering/scheduling constraints
+            + One process/thread can wait for an event to be signaled by another process/thread
+            + Create/destory
+            + Wait
+            + Signal(all threads that wait on it receive)
+        - UNIX signals 
+            + Can be used for synchronization
+                - Signal handler sets a flag
+                - Main thread polls on the value of the flag
+                - Busy wait though
+
+    Synchronization Primitives Summary:
+        - Locks
+            + Simple semantics, often close to hardware primitives
+            + Can be inefficient if implemented as a spin lock
+        - Semephores
+            + Internal queue - more efficient if integrated with scheduler
+        - Monitors
+            + Language constructs that automate the locking
+            + Easy to program with when supported by the language and where the model fits the task
+            + Once condition variables added in, much of the ocmplexity comes back
+        - Events/Messages
+            + Simple model of synchronization via data sent over a channel
+
+---- Slideset 9 - Classic Syncronization Problems --------------------------------------------------------------------- 
+ 
+    Bounded-Buffer Problem: (Producer/Consumer)
+        - Finite size buffer (array) in memory shared by multiple processes/threads
+        - Procuder threads "produce" an item and place it in the buffer
+        - Consumer threads remove an item from the buffer and "consume" it
+        - Why do we need synchronization
+            + Shared data - the buffer state
+            + Which parts of the buffer are free? Which filled?
+        - What could go wrong?
+            + Producer doesnt stop when no free spaces
+            + Consumer tries to consume an empty space
+            + Consumer tries to consume a space that is only half-filled by the producer
+            + Two producers try to fill the same space
+            + Two consumers try to consume the same space
+        
+        Semaphore Solution 1: (inneficeint)
+            - initalize 3 semephores
+                + Mutex (mutually exclusive access)
+                + Full (if space is full)
+                + Empty (is space is empty)
+            - Producer 
+                + waits until empty semephore somewhere
+                + only goes to claim the mutex after it finds empty
+                + waits for mutex to unlock once its found an empty space
+                + produces for empty space when availible
+                + signals mutex and full for that space
+            - Consumer
+                + waits until full semephore somewhere
+                + only goes to claim the mutex after it finds full
+                + waits for mutex to unlock once its found an Full space
+                + produces for empty space when availible
+                + signals mutex and empty for that space
+            - Could be better
+                + dont know how long to produce/consume
+                + If it takes a long time, it becomes inneficeint
+            Code:
+                semaphore_t mutex;
+                semaphore_t full;
+                semaphore_t empty;
+
+                container_t {
+                    BOOL free = TRUE;
+                    item_t   item;
+                }
+                container_t buffer[FIXED_SIZE];
+
+                void initBoundedBuffer{
+                    mutex.value = 1;
+                    full.value = 0;
+                    empty.value = FIXED_SIZE	
+                }
+                void producer (){
+                    container_t *which;	
+                    wait(empty);
+                    wait (mutex);
+                    
+                    which = findFreeBuffer();
+                    which->free = FALSE;
+                    which->item = produceItem();
+                    
+                    signal (mutex);
+                    signal (full);
+                }
+                void consumer (){
+                    container_t *which;	
+                    wait(full);
+                    wait (mutex);
+                    
+                    which = findFullBuffer();
+                    consumeItem(which->item);
+                    which->free = TRUE;
+                    
+                    signal (mutex);
+                    signal (empty);
+                }
+
+        Semaphore Solution 2:
+            - Add lock bool to container
+            - Producer
+                + after mutex is unlocked, set current container to find a free unlocked buffer
+                + set that buffer locked to true
+                + signal the mutex
+                + produce
+                + set status to full
+                + signal that there is a space full
+            - Consumer
+                + after mutex is unlocked, set current container to find a full unlocked buffer
+                + set that buffer locked to true
+                + signal the mutex
+                + consume
+                + set status to empty
+                + signal that there is a space empty
+            - Now it doesnt matter how long it takes to produce because that is locked per buffer
+            Code:
+                semaphore_t mutex;
+                semaphore_t full;
+                semaphore_t empty;
+
+                container_t {
+                    BOOL free = TRUE;
+                    BOOL locked = FALSE;
+                    item_t   item;
+                }
+                container_t buffer[FIXED_SIZE];
+
+                void initBoundedBuffer{
+                    mutex.value = 1;
+                    full.value = 0;
+                    empty.value = FIXED_SIZE	
+                }
+
+                void producer (){
+                    container_t *which;	
+                    wait(empty);
+                    wait (mutex);
+                    
+                    which = findFreeUnlockedBuffer();
+                    which->locked = TRUE;
+                    signal (mutex);
+                    
+                    which->item = produceItem();
+                    which->free = FALSE;
+                    which->locked = FALSE;
+                    
+                    signal (full);
+                }
+
+                void consumer (){
+                    container_t *which;	
+                    wait(full);
+                    wait (mutex);
+                    
+                    which = findFullUnlockedBuffer();
+                    which->locked = TRUE;
+                    signal (mutex);
+                    
+                    consumeItem(which->item);
+                    which->free = TRUE;
+                    which->locked = FALSE;
+                    
+                    signal (empty);
+                }
+
+        Monitor Solution: 
+            - call monitor instead of mutexes
+                + call condition variables 
+                    - oneEmptied
+                    - oneFilled
+                + count numFull
+            - Producer
+                + while numFull is equal to size of array wait for oneEmptied
+                + once empty is found, produce
+                + add count to numFull
+                + signal oneFilled
+            -Consumer
+                + while numFull is equal to 0 wait for oneFull
+                + once full is found, consume
+                + take one away from numFull
+                + signal oneEmptied 
+            Code: 
+                container_t {
+                BOOL free = TRUE;
+                item_t   item;
+                }
+
+                monitor boundedBuffer {
+                    conditionVariable oneEmptied;
+                    conditionVariable oneFilled;
+                    container_t buffer[FIXED_SIZE];
+                    int numFull = 0;
+
+                    void producer (){
+                        while(numFull == FIXED_SIZE){
+                        wait(oneEmptied)
+                        }
+                        
+                        which = findFreeBuffer();
+                        which->free = FALSE;
+                        which->item = produceItem();
+                        numFull++
+
+                        signal(oneFilled);
+                    }
+
+                    void consumer (){
+                        while(numFull ==0){
+                        wait(oneFilled)
+                        }
+                        
+                        which = findFullBuffer();
+                        consumeItem(which->item);
+                        which->free = TRUE;
+                        numFull--;
+
+                        signal(oneEmptied);
+                    }
+                }
+
+    Reader/Writers:
+        - Shared data area being accessed by multiple processes/threads
+        - Reader threads look but dont touch
+            + We can allow multiple readers at a time
+        - Writer threads touch too
+            + If a writer is present, no other writers and readers
+        - Producer/Consumer is a subset of this
+            + Producer/Consumer is a writer
+            + While there is no reader, there could be a report buffer function
+        - Fundamentally all synchronization problems are Reader/Writer problems
+
+        - Reader's preferance
+            + Uses okToWrite semephore and numReaders int
+                - If numReaders = 1 then force writers to wait
+                - If numReaders = 0 on exit signal writes to write
+            + Good for parallelism between readers
+            + Can starve writers
+                - Readers can pass batton and never trigger okToWrite signal
+            Code:
+                semaphore_t numReadersLock;
+                semaphore_t okToWrite;
+                int         numReaders;
+
+                void init{
+                    numReadersLock.value = 1;
+                    okToWrite.value = 1;
+                    numReaders = 0;	
+                }
+                void writer (){
+                    wait(okToWrite);
+
+                    do writing (could pass
+                in pointer to write function)
+
+                    signal(okToWrite);
+                }
+                void reader (){
+                    wait(numReadersLock);
+                    numReaders++;
+                    if (numReaders ==1){
+                        wait(okToWrite); //not ok to write
+                    }
+                    signal(numReadersLock);
+
+                    do reading (could pass in pointer to read function)
+
+                    wait(numReadersLock);
+                    numReaders--;
+                    if (numReaders == 0) {
+                        signal(okToWrite); //ok to write again
+                    }	
+                    signal (numReadersLock);
+                }
+
+        - Fair
+            + Could do okToAccess instead of okToWrite and numReaders
+                - Secure and fair, but no parallelism
+            + Better solution is semephores numReadersLock, incomingQueue, nextInLine and int numReaders
+                -  Writers
+                    + First wait for incomingQueue, then wait for nextInLine
+                    + once past nextInLine, signal incomingQueue to let someone else be nextInLine
+                    + write
+                    + signal new nextInLine to go
+                - Readers 
+                    + Wait for incomingQueue and numReadersLock
+                    + once past numReadersLock, increment numReaders
+                    + if numReaders = 1 then wait at nextInLine
+                    + else
+                    + signal numReadersLock to let someone in
+                    + signal incomingQueue to let someone be next
+                    + read
+                    + wait for numReadersLock
+                    + decrement numReaders
+                    + if numReaders = 0, signal nextInLine
+                    + signal numReadersLock
+                Code:
+                    semaphore_t numReadersLock, incomingQueue, nextInLine;
+                    int         numReaders;
+
+                    void init{
+                        numReadersLock.value = 1;
+                        incomingQueue.value = 1;
+                        nextInLine.value = 1;
+                        numReaders = 0;	
+                    }
+                    void writer (){
+                        wait (incomingQueue);
+                        wait (nextInLine);
+                    
+                        //Let someone else move on
+                        //to wait on next
+                        signal(incomingQueue);
+                        
+                        do writing
+                        
+                        signal (nextInLine);
+                    }
+                    void reader (){
+                        wait(incomingQueue);
+                                
+                        wait(numReadersLock);
+                        numReaders++;
+                        if (numReaders == 1) {
+                                wait (nextInLine);
+                        } 	    
+                        signal(numReadersLock);
+
+                        //If next on incoming is 
+                        //writer will block on next
+                        //If reader will come in
+                        signal(incomingQueue);
+
+                        do reading
+
+                        wait(numReadersLock);
+                        numReaders--;
+                        if (numReaders == 0){
+                            signal (nextInLine);
+                        }
+                        signal(numReadersLock);
+                    }
+
+---- Slideset 10 - Deadlock ------------------------------------------------------------------------------------------- 
+
+    Dining Philosophers Problem:
+
+          P C P         P is a philosipher
+        P C   C P       C is a chopstick
+        C       C       In this case N = 8
+        P C   C P    
+          P C P
+
+        - have N philosophers and N chopsticks
+            + Philospers think and eat
+            + Philosophers must share the choptick to left and right of them 
+              with the philosophers left and right of them
+            + Represent with semephore chopstick[N]
+            + philosopher i thinks until they are hungry
+            + when they get hungry, they wait to grab chopstick[i]
+            + once they do grab it, they wait for chopstick[i-1 % N] 
+              (% N makes it so philosopher[n] grabs the one between them and philosopher[1])
+            + they then eat until they put down the chopstick
+            + once done with that, they signal that the two chopsticks are open for use
+            + THIS CAN LEAD TO DEADLOCK!
+                - If everyone decidedes to start eating at the same time they will first grab the chopstick to their right
+                - Then they will wait to grab the chopstick to their left
+                - Because everyone has 1 chopstick, everyone is waiting and no one can release the locks
+        Code:
+            semaphore_t chopstick[NUM_PHILOSOPHERS];
+
+            void init(){
+            for (i=0; i< NUM_PHILOSOPHERS; i++)
+                chopstick[i].value = 1;
+            }
+
+            void philosophersLife(int i){
+                while (1) {
+                
+                think(); 
+
+                wait(chopstick[i])
+                grab_chopstick(i);
+                wait(chopstick[(i-1) % NUM_PHILOSOPHERS])
+                grab_chopstick(i-1);
+
+                eat();
+
+                putdownChopsticks()
+                signal(chopstick[i]);
+                signal(chopstick[(i-1) % NUM_PHILOSOPHERS]);
+                    
+                } 
+            }
+
+        - Fixing dining philosophers
+            + Make philosophers grab both chopsticks they need atomatically
+                - Pass around a token (lock) saying whi can grab chopsticks
+            + Force philosophers to put down chopsticks
+                - Hard to make them go back
+            + Better semephore
+                - If i > i-1 % N then get chopstick[i] first
+                - else get chopstick[i-1] first
+                - this eliminates circular wait
+            Code:
+                void philosophersLife(int i){
+                    while (1) {
+                    think(); 
+                    if ( i < ((i-1) % NUM_PHILOSOPHERS))}{
+                            wait(chopstick[i]);
+                            wait(chopstick[(i-1) % NUM_PHILOSOPHERS]);
+                    } else {
+                            wait(chopstick[(i-1) % NUM_PHILOSOPHERS]);
+                            wait(chopstick[i]);
+                    } 
+                    
+                    eat();
+
+                    signal(chopstick[i]);
+                    signal(chopstick[(i-1) %
+                        NUM_PHILOSOPHERS]);
+
+                    } 
+                }
+
+    Deadlock:
+        - Deadlock exists in a set of processes and threads when all the processes/threads in the set
+          are waiting for an event that can only be caused by another processes in the set
+            + Dining philosophers is a perfect example because it models a situation where they all must wait for one 
+              another to finish eating but in order to do that, they must wait for everyone else
+        - Model deadlock with a deadlock allocation graph
+            + each node in the graph represents a process/thread or a resource
+            + an edge from node P to R indicates that process P requests resource R
+            + an edge from node R to P indicates that process P holds resources R
+            + If a graph has a cycle, deadlock MAY exist. If graph has no cycle, deadlock CANT exist
+        - Deadlock can ONLY exist if only if the following four conditions are met
+            + Mutually Exclusion: some resource must be held exclusively
+            + Hold and Wait: some process must be holding one resource and waiting for another
+                - Do not let processes hold a resource while waiting for another
+                    + Make processes get all resources at once
+                    + Windows WaitForMultipleObjects
+                - Make processes get all needed resources at the beginning
+                    + Disadvantage: May not need all resources the whole time
+                    + Can release them early but must hold until used
+                - Make processes release all resources before requesting more
+                    + hard to program
+            + No preemption: resources cannot be preempted (take them away)
+                - Kill processes if they hold onto resources too long
+                - Allow system to take back resources
+                    + hard to program, system has to figure out how to take the resources without breaking proammers illusion
+                    - Possibly use checkpoint and rollback
+            + Circular Wait: there must be a set of processes (p1,p2,...,pn) 
+              where p1 is waiting for p2, p2 is waiting for p3,... and pn is waiting for p1
+                - Impose ordering on the resources
+                    + hard to think of all of types of resources in system and order them
+                    + how to prioritize one resource over another in order
+                    
+    Deadlock Avoidance:
+        - Have processes decalre the maximum resources thay may ever request from the beginning
+        - During exectuion, have system only grant a request if it can assure that all processes can run to completion without deadlock
+        - Consider a set of processes (p1,p2,...,pn) which each declare the maximum resources they might ever request
+        - When pi actually requests a resource, the system will only grant the request if the system could grant pi's maximum resource
+          request with the resources currently availible plus the resources held by all the processes pj for j > i
+        - May need p1 to complete then p2 all the way to pi but pi can complete
+
+    Banker's Algorithm
+        - Decide whether to grant a resource (a loan, give a philosipher a chopstick, give a process a lock)
+        - Let there be P processes and R resources
+        - Keep track of 
+            + Number of units of each resource availible
+            + Maximum number of units each resource that each process could request
+            + Current allocation of each resource to each process
+        - Simulate the completion of everyone
+            + Very expensive so general purpose OS tend not to use it 
+        Code: 
+            unsigned available[R]; 
+            unsigned allocation[P][R];
+            unsigned maximum[P][R];
+
+            startProcess(unsigned p){
+                for (i=0; i< R; i++){
+                    maximum[p][i] = max number of resource i that process p will need at one time; 
+                }
+            }
+
+            BOOL request(unsigned p, unsigned r){
+                if (allocation[p][r] + 1 > maximum[p][r]){
+                    //p lied about its max
+                    return FALSE;
+                }
+
+                if (available[p][r] == 0){
+                    //can’t possibly grant; none available
+                    return FALSE;
+                }
+
+                if (canGrantSafely(p, r))
+                    allocation[p][r]++;
+                    available[r]--;
+                    return TRUE;
+                } else {
+                    return FALSE;
+                }
+            }
+            BOOL canGrantSafely(unsigned p, unsigned r){
+                unsigned free[R]; 
+                unsigned canFinish[P];
+                
+                for (j=0; j< R; j++) free[j] = available[j];
+                for (i=0; i< P; i++) canFinish[i] = FALSE;
+
+            lookAtAll: for (i=0; i< P; i++){
+                allCanFinish = TRUE; 
+                if (!canFinish[i])
+                    allCanFinish = FALSE;
+                    couldGetAllResources = TRUE;
+                    for (j=0; j< R; j++){
+                    if (maximum[i][j] - allocation[i][j] >  free[j]){
+                        couldGetAllResources = FALSE;
+                    }
+                    }
+                    if (couldGetAllResources){
+                    canFinish[i] = TRUE;
+                    for (i=0; i< R; i++) free[j] += allocation[i][j];
+                    }
+                }
+            } //for all processes (lookAtAll)
+                if (allCanFinish) {
+                    return TRUE;
+                }else {
+                    goto lookAtAll;
+                }
+            }
+
+    If you dont prevent deadlock:
+        - Two choices:
+            + Enable the system to detect deadlocks and if it does recover
+            + Hope the deadlock never happens and rely on manual detection and recovery (i.e. kill process when it hangs)
+    
+    Deadlock Detection:
+        - Can periodically look at the state of all the processes in the System
+            + If process is holding anything, act like it exits
+            + If the process is not requesting anything, act like it exits and return its resources to the system
+              and see if that would allow any other processes to complete
+                - If all processes complete that way great
+                - If not, then left with knot or cycle in the grapgh
+                - To solve it requires simulating completion of the processes like Banker's Algorithm
+        - Unlike bankers, you can choose how often to run this, how many processes will be effected, when CPU usage drops below x%
+    
+    Recovering form deadlock:
+        - How many?
+            + Abort all deadlocked processes
+            + Abort one process at a time until cycle is eliminated
+        - Which ones?
+            + lowest priority with canFinish = FALSE
+            + One that has been running the least amount of time
+            + Process that hasnt been killed before (any way to tell?)
+        
+    Prevention vs Avoidence vs Detection:
+        - Spectrum of low resource utilization
+            + Prevention gives up most chances to allocate resources
+            + Detection always grants resource if they are available when requested
+        - Also spectrum of runtime “overhead”
+            + Prevention has very little overhead; programmer obeys rules and at runtime system does little
+            + Avoidance uses banker’s algorithm (keep max request for each process and then look before leap) 
+            + Detection algorithm basically involves building the full resource allocation graph  
+            + Avoidance and detection algorithms both expensive! O(R*P2)

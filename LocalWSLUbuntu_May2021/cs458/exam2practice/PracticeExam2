@@ -1,0 +1,141 @@
+Question 1: 
+For the following program, show what woudl result from bubbling up the postcondition.
+
+method diff(x0: int, y: int)
+requires x0 > 0
+ensures r > 0
+{
+	var x := x0;
+	if(x <= y)
+	{
+		x := x + y;
+	}
+	return x - y;
+}
+requires x0 > 0
+
+	
+---------------------------------------------------------------------------------------------------------------------------------
+
+Question 2: 
+For the following program
+	A.  Give a useful postcondition.
+	B.  Give a loop invariant.
+	C.  Give a variant used to show the loop terminates.
+	D.  Show all the paths in the program, and the code along each path.
+
+method f(n: int) returns (r: int)
+requires n > 5
+{
+  var i := 0;
+  var c := 0;
+  while i < n
+  {
+    if i >= 5
+    {
+      c := c + 2;
+    }
+    i := i + 1;
+  }
+  return c;
+}
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+Question 3a:
+This method passes an array of integers and the size of the array as parameters, where size could be less than the actual length.  
+It modifies the array so that every element is replaced by its absolute value.  You need to verify that this works correctly.  
+Don't forget that you sometimes have to specify that things have not changed.
+	A.   Give preconditions
+	B.   Give postconditions
+	C.   Give loop invariants
+
+method abs(A: array<int>, size: nat)
+{
+  var i := 0;
+	while i < size
+	{
+		if (A[i] < 0) 
+    {
+			A[i] := -A[i];
+		}
+    i := i + 1;
+	}
+}
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+Question 3b:
+This method takes an array of integers and returns true if the array contains a duplicate.  
+You need to verify it.
+	A.   Give preconditions
+	B.   Give postconditions
+	C.   Give loop invariants
+
+method Duplicate(A: array<int>) returns(r: bool)
+{
+  var i := 0;
+  var j;
+  while i < A.Length
+  {
+    j := i + 1;
+    while j < A.Length
+    {
+      if A[i] == A[j]
+      {
+        return true;
+      }
+      j := j + 1;
+    }
+    i := i + 1;
+  }
+  return false;
+}
+
+---------------------------------------------------------------------------------------------------------------------------------
+
+Question 3c: (Will not have a question this hard on test)
+This method sorts an array of integers using the Selection Sort algorithm  
+It calls another method called MaxIndex which returns the index of the largest number in an array.  
+You need to verify both methods.  
+I have given predicates sorted and all_smaller, which we talked about in class.  
+The predicate all_smaller applies in the special case of partitioned where there is only one element in the second part.  
+Feel free to use my predicates.
+	A.   Give preconditions
+	B.   Give postconditions
+	C.   Give loop invariants
+
+predicate sorted(A: array<int>, i: int, j: int)
+reads A
+{forall k :: 0 <= i <= k < j < A.Length ==> A[k] <= A[k+1] }
+
+predicate all_smaller(A: array<int>, a: int, b: int, c: int)
+reads A
+{forall i :: 0 <= a <= i <= b < A.Length && 0 <= c < A.Length ==> A[i] <= A[c]}
+
+method MaxIndex(A: array<int>, size: nat) returns(r: nat)
+{
+  r := 0;
+  var i := 1;
+  while i < size
+  {
+    if A[r] < A[i]
+    {
+		r:= i;
+    }
+    i := i + 1;
+  }
+  return r;
+}
+
+method SelectionSort(A: array<int>)
+{
+  var i := A.Length;
+  var m;
+  while i >= 2
+  {
+    m := MaxIndex(A,i);
+    A[i-1],A[m] := A[m],A[i-1];
+    i := i - 1;
+  }
+}

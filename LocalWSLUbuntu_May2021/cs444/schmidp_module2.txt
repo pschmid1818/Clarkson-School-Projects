@@ -1,0 +1,58 @@
+schmidp_module2_q1: Which is not a disk sceduling algorithm.
+A. SCAN
+B. SS-SCAN
+C. C-SCAN
+D. SSTF
+Answer: B
+
+schmidp_module2_q2: Virtual Memory does not provide _.
+A. Protection and isolation among processes
+B. Harware protection
+C. Illusion of more availible system memory
+Answer: B
+
+schmidp_module2_q3: RAID1 does which of the following?
+A. Interleaving Data
+B. Protects against failure in multiple drives using one parity drive
+C. Protects against failure in multiple drives using rotating parity drive
+D. Mirroring
+Answer: D
+
+schmidp_module2_q4: Non-volitile memory _.
+A. Keeps its contents when power is removed
+B. Is used is primary storage like disks
+C. Both A and B.
+D. None of the above.
+Answer: A
+
+schmidp_module2_q5: 
+A. 
+B. 
+C. Both A and B.
+D. None of the above.
+Answer: 
+
+schmidp_module2_q6: Hard disks have internal caches.
+A. True
+B. False
+Answer: A
+
+schmidp_module2_q7: SCAN and C-SCAN preform better for systems with low load on disks.
+A. True
+B. False
+Answer: B
+
+schmidp_module2_q8: RAID uses multiple disks instead of one.
+A. True
+B. False
+Answer: A
+
+schmidp_module2_q9: RAID uses one disk instead of multiple.
+A. True
+B. False
+Answer: B 
+
+schmidp_module2_q10: RAID is a replacement for backups.
+A. True
+B. False
+Answer: B

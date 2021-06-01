@@ -1,0 +1,75 @@
+---- problem 1
+
+(declare-sort A)            ; declares people, A is a person
+(declare-fun M (A A) bool)  ; decalres a function that relates 2 people as mother and child
+(declare-const 0 A)         ; declare people 0-5
+...
+(declare-const 5 A)
+
+; Somebody has a mother
+; There exists two people x and y such that y is the mother of x 
+; Ex,y | M(y,x)
+(assert (exist (x A) (y A)) (M y x))
+
+; Everybody has a mother who is not themselves
+; For all people x there exists a person y such that y is the mother of x and x != y 
+; Vx Ey | M(x,y) n x!=y
+(assert (forall ((y A)) (exists ((x A)) (and (M x y) (not (= x y))))))
+
+; Nobody can have 2 mothers
+; for all people x,y,z if y is the mother of x and z is the mother of x, then y = z3
+; Vx,y,z, M(y,x) n M(z,x) -> y = z
+(assert (forall ((x A) (y A) (z A)) (=> (and (M x z) (M y z)) (= x y))))
+
+; Somebody has at least 2 children
+; There exists people x, y, and z such that x is the mother of y and of z
+; Ex,y,z | M(x,y) n M(x,z) n y != z
+(assert (exists ((x A)(y A)(z A)) (and (M x y) (M x z) (not (= y z)))))
+
+
+---- problem 2 (builds on 1)
+
+(declare-const ann A)       ; a person ann
+(declare-fun age (A) Int)   ; function that takes in type A and assigns an int to it
+
+; Your mother is older than you
+; for all people x and y such that y is the mother of x, y is older than x
+; Vx,y | M(y,x) -> age(y) > age(x)
+(assert (forall ((x A) (y A)) (=> (M y x) (> (age y) (age x)))))
+
+; Everybody has a mother except possibly Ann
+; For all people x if x != Ann then there exists a person y who is x's mother
+; Vx, x != Ann -> M(x, y)
+(assert (forall ((y A)) (=> (not (= y ann)) (exists ((x A)) (M(x,y)))))
+
+; Age is positive
+; For all x, age > 0
+; Vx, age(x) > 0
+(assert (forall ((x A)) (> (age x) 0)))
+
+---- problem 3
+
+; Somebody is the mother of everybody
+; There exists somebody y who is the mother of for all people x
+; Ey Vx | M(y,x)
+(assert (! (exists ((y A)) (forall ((x A)) (M y x))) :named supermother))
+
+; Nobody has a mother
+; for all people x, there is not a person y such that y is the mother of x
+; Vx !Ey | M(y,x)
+(assert (! (forall ((x A)) (not (exists ((y A)) M(y,x)))) :named nomothers))
+
+; Somebody has no mother
+; there exists a person x such that for all y, x has no mother you
+; Ex !Vy | M(y,x)
+(assert (! (exists ((x A)) (not (forall ((x A)) M(y,x))) :named nomother))
+
+--- problem 4
+; Everybody has a mother
+; For all people x there exists someone y such that y is x's mother
+; Vx,y | M(y,x)
+(assert (exists ((x A) (y A)) (M y x)))
+
+; You cannot be your own maternal grandmother
+; Vx,y,z | M(x,y) n M(y,z) -> x != z
+(assert (forall ((x A) (y A) (z A)) (=> (and (M x y) (M y z)) (not (= x z))))

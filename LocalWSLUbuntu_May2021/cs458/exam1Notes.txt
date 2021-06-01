@@ -1,0 +1,252 @@
+--------------------------------------------------------------------------------------------------------------------------------------
+EXAM NOTES
+--------------------------------------------------------------------------------------------------------------------------------------
+-use propositional logic
+    ***If ask for propositional logic, must use propositional logic
+-integer arithmatic
+-declaring functions but not defining functions
+-equality
+-quantifiers and first order logic
+    ***this is the hardest part
+-Either mathematical or z3 notation
+    - wont be too concerned on syntax
+    - E is "There exists..." (should be backwards)
+    - A is "For all..." (should be upsidedown A)
+    - -> is "then ..." (used as => in z3)
+
+also be able to interpret models
+this is all covered in first 4 homeworks
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+Needed for all homework problems z3
+-(set-option :produce-unsat-core true); only need for problem 3
+-(declare-sort A)
+-(declare-fun M (A A) bool)
+-(declare-fun age (A) Int); only need for problem 2
+-(declare-const ann A); only need for problem 2
+
+...
+
+-(check-sat)
+-(get-model); only need for problem 1,2
+-(get-unsat-core); only need for problem 3
+    -to get unsat-core you must name something (assert (! (equation) :name))
+
+--------------------------------------------------------------------------------------------------------------------------------------
+Z3 SYNTAX 
+--------------------------------------------------------------------------------------------------------------------------------------
+Prepositional Logic:
+or:          (or p q)
+and:         (and p q)
+not:         (not p)
+equal:       (= p q)
+implication: (=> p q)
+xor:         (xor p q)
+
+Mathematical Operators:
+addition:                 (+ a b)
+subtraction:              (- a b)
+multiplication:           (* a b)
+division:                 (/ a b)
+less than:                (< a b)
+greater than:             (> a b)
+less than or equal to:    (<= a b)
+greater than or equal to: (>= a b)
+
+Predicate Logic:
+(exists ((x Int)) [...]) - there exists an interger x that ...
+(forall ((x Int)) [...]) - for all integers x ...
+
+Declariation:
+(declare-const x bool) - a constant variable x of type bool (Bool, Int, Real)
+(declare-fun F (Int) bool) - a function F that takes in a Int and returns a bool
+(declare-datatypes() ((type x0 x1 x2)(other y0 y1 y2))) - declares a datatype with values
+(declare-sort A) - declare a datatype without values called A
+
+Commands:
+(check-sat) - checks satisfiablity
+(get-model) - gives model to read
+(assert [logic]) - makes this statement have to be true (can use assert to set a const to a value with (assert (= x 5)))
+(push)
+(pop) - delete all assertions after the push
+(set-option :produce-unsat-cores true) - tell z3 you will be using unsat core
+(assert (! (equation) :named [name])) - tells unsat-core what this assertion is named
+(get-unsat-core) - gives which asserts are unsat 
+
+Returns:
+(ite (= x!0 a) 1  - If then else: If x0 = a then 1, if x0 = b then 4, else x0 = 3
+ (ite (= x!0 b) 4
+ 3
+)))
+(let a!1 [other returns]) - creates a new function a1 
+
+--------------------------------------------------------------------------------------------------------------------------------------
+NOTES FROM CLASSES
+--------------------------------------------------------------------------------------------------------------------------------------
+---- Jan 19th ------------------------------------------------------------------------------------------------------------------------------------
+Preposition: Statement that is true or false
+-It is raining
+-I am hungry
+-not x + 2
+-not Joe
+
+Variables:
+p, q
+Operators:
+or:      p | q
+and:     p & q
+not:     !p
+implies: p -> q (same as !p or q)
+equals:  p = q
+xor:     p + q (true is an odd number of propositional variables are true)
+
+Formula:
+(p & q) -> (p | q)
+
+To show, use truth table. 1 = true, 0 = false
++---+---+-------+-------+-------+--------+-------+----+
+| p | q | p & q | p | q | p + q | p -> q | p = q | !p |
++---+---+-------+-------+-------+--------+-------+----+
+| 0 | 0 |   0   |   0   |   0   |   1    |   1   |  1 |
+| 0 | 1 |   0   |   1   |   1   |   1    |   0   |  1 |
+| 1 | 0 |   0   |   1   |   1   |   0    |   0   |  0 |
+| 1 | 1 |   1   |   1   |   0   |   1    |   1   |  0 |
++---+---+-------+-------+-------+--------+-------+----+
+
+(TA is truth assignment)
+F is satisfiable if at leat one TA makes F true
+F is unsatisfiable if no TA makes F true
+F is valid or tautology if all TAs make F true (if it F valid, its negation is unsatisfiable and vise versa)
+----------------------------------------------------------------------------------------------------------------------------------------------
+---- Jan 26th --------------------------------------------------------------------------------------------------------------------------------
+Theorum proving: Let S be a set of formulas and F be a formulas
+Notation S|=Feb
+    - Does S logically imply F?
+    In other words:
+    - All TAs making S true also make F true
+    
+The following all mean the same thing
+1. S|=F
+2. Whenever S is true, F is also true
+3. There is no way for S to be true and F to be false
+4. S&!F is unsat
+
+So to check S|=F, we check sat of S&!F
+1. If S&!F is unsat then S|=F is true
+2. If S&!F is sat then S|=F is false
+    - the model that z3 gives is a counter example
+
+- Party problem -
+At least one of the men attended:  B | C | D 
+If Ann and Bill attended then Charlie did too:  (A & B) -> C 
+If Bill attended then Charlie did not:  B -> !C 
+If Bill or Charlie attended then Dave did too:  (B | C) -> D 
+ 
+The goal we want to prove: 
+  If Ann attended then Dave did:  A -> D 
+ 
+The negation of the goal is: !(A -> D) 
+ 
+Assert 1 - 4 in z3. 
+Assert the negation of the goal in z3. 
+If z3 says UNSAT then the goal is proved. 
+
+Binary addition:
+  [c1,c0]
+  [x2,x1,x0]
++ [y2,y1,y0]
+------------
+  [z2,z1,z0]
+z0 = y0 + x0
+c0 = x0 & y0
+z1 = x1 + y1 + c0
+c1 = (x1 & y1) | (x1 & c0) | (y1 & c0)
+z2 = x2 + y2 + c1
+
+Binary Subtraction:
+  Z = [z2,z1,z0]
+- Y = [   y1,y0]
+----------------
+  X = [x2,x1,x0]
+
+If we know that addition is correct,
+To test subtraction,
+Use subtraction to complete X = Z - y,
+Then check that X + Y = Z
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+---- Jan 28th -----------------------------------------------------------------------------------------------------------------------------------
+Unsat core:
+a minimal set of assertions that make a problem unsatisfiable
+this can be useful information
+- and easier than an actual proof
+
+Types:
+Bool, Int, Real
+Mathematical Operators:
+    <, >, <=, >=, +, -, *, /
+Int is harder to solve than Real
+    x*x=2    2*x+4*y=1
+An expression is non-linear if 2 variables are multiplied by each other
+Solving non-linear equations over Ints is undecidable
+So sometimes z3 will time out, run forever, or say I dont know
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+---- Feb 2nd ------------------------------------------------------------------------------------------------------------------------------------
+Real numbers: 
+    are wacky
+
+Predicate Logic (Quantifiers):
+For all x in the integers, x >=0 or x < 0
+    Ax Int (x >= 0 | x < 0 )
+There exists an integer such that x > 0
+    Ex Int | x > 0
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+---- Feb 4th ------------------------------------------------------------------------------------------------------------------------------------
+Equality:
+a=b, b=c, c=d |= a=D
+So a=b, b=c, c=d, a!=d is UNSAT
+
+It doesnt matter what type a,b,c and d are
+It only depends on the properties of equality
+To make it abstract:
+    - we declare a,b,c and d as members of a new sort A
+
+equality with functions:
+f(g(a)) = b, g(a) = c |= f(c) = b
+So f(g(a)) = c, g(a) = c, f(c) != b is UNSAT
+
+Predicate logic:
+Assume some universe
+-for example all people
+a and b are constants, standing for elements of the universe
+-a stands for ann, b stands for bill
+P is a property (maps type A to bool)
+-P(x) means that x is a male
+-P is a predicate symbol with 1 argument
+-P(b) is true, P(a) is false
+Q is a question
+-Q(x,y) means that x is father of Y
+-Q is a predicate symbol with 2 arguments
+-Q(b,a) is true
+
+!P(a)
+P(a) | P(b)
+!P(b)
+
+UNSAT becasue it isnt true in any universe
+
+Rules of thumb:
+1. forall usually goes with ->
+2. exists usually goes with &
+3. if you dont know hwich quantifier to use, it is probabbly forall
+
+Relataions:
+Predicates can have more than one argument
+
+
+
+

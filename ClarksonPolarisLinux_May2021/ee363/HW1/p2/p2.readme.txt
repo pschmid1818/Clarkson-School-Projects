@@ -1,0 +1,32 @@
+Paul Schmid
+EE363
+BinarySearch
+
+To Execute:
+	Compile with: 
+	javac -cp stdlib.jar BinarySearch.java
+
+	Run with: 
+	java -cp stdlib.jar BinarySearch [.txt] 
+		for user input 
+	or
+	java -cp stdlib.jar BinarySearch [1.txt] < [2.txt]
+		to check if anything in [2.txt] is whitelisted in [1.txt]
+
+
+What it does:
+	Binary search takes in an input from an external file and creates a whitelist of numbers with it. 
+	It then either takes in a user input or a second text file and checks the input against the whitelist and displays the binary search's high and low values.
+	Finally it prints out any values not present on the whitelist.
+
+
+Added code:
+	In indexOf:
+		"int cout=0;"                              adds a count variable
+		"for(int c=0; c<=count; c++);"             creates a for loop that loops as many times as count is up to
+		"StdOut.print(" ");"                       prints out spaces equal to the amount of loops
+		"StdOut.println("[" + lo + "," + hi "]");" displays current loops lo and hi value like "[x,y]"
+		"count++"                                  raises count every loop
+	In main:
+		N/A
+	

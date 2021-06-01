@@ -1,0 +1,2 @@
+A standard text file used to test Polaris
+If this message shows, it works!

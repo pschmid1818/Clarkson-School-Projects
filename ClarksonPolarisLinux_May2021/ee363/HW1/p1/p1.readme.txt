@@ -1,0 +1,29 @@
+
+Paul Schmid
+EE363
+FibonacciArr
+
+To Execute:
+	Compile with:
+		javac -cp stdlib.jar FibonacciArr.java
+	Run with:
+		java -cp stdlib:. FibonacciArr
+
+
+What it does:
+	FibonacciArr displays the fibonacci array up to 10, 90 made tests too slow
+
+
+Added code:
+	in F:
+		N/A
+	in main:
+		"long full[] = new long[11];"                               creates a long array of lenth 11 to display the full sequence
+		"long temp= F(N);"                                          creates a temp variable with store current value
+		"full[N]=temp;"                                             stores temp variable in the array
+		"for (int c=0; c<=10 c++) StdOut.println(c + " " full[c]);" prints the array
+
+Question:
+	1  Hour    - index = 56 - value = 225851433717
+	10 Minutes - index = 52 - value = 32951280099
+

@@ -1,0 +1,238 @@
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style type="text/css">
+		.header {
+		  padding: 20px;
+		  text-align: center;
+		  background: #8DAABA;
+		  color: black;
+		  border: 2px solid black;
+		  font-size: 30px;
+		}
+		
+		/* The side navigation menu */
+		.sidebar {
+		  margin: 0;
+		  padding: 0;
+		  width: 250px;
+		  border-left: 2px solid black;
+		  border-right: 2px solid black;
+		  border-bottom: 2px solid black;
+		  background: #8DAABA;
+		  position: absolute;
+		  height: 100%;
+		  overflow: auto;
+		}
+
+		/* Sidebar links */
+		.sidebar a {
+		  display: block;
+		  color: black;
+		  padding: 16px;
+		  text-decoration: none;
+		}
+
+		/* Active/current link */
+		.sidebar a.active {
+		  background-color: #4CAF50;
+		  color: white;
+		}
+
+		/* Links on mouse-over */
+		.sidebar a:hover:not(.active) {
+		  background-color: #555;
+		  color: white;
+		}
+
+		/* Page content. The value of the margin-left property should match the value of the sidebar's width property */
+		div.content {
+		  margin-left: 253px;
+		  height: relative;
+		  border-right: 2px solid black;
+		  border-bottom: 2px solid black;
+		  text-align: center;
+		  background: #8DAABA;
+		  padding: 10px;
+		  font-size: 32px;
+		  
+		}
+
+		/* On screens that are less than 700px wide, make the sidebar into a topbar */
+		@media screen and (max-width: 700px) {
+		  .sidebar {
+			width: 100%;
+			height: auto;
+			position: relative;
+		  }
+		  .sidebar a {float: left;}
+		  div.content {margin-left: 0;}
+		}
+
+		/* On screens that are less than 400px, display the bar vertically, instead of horizontally */
+		@media screen and (max-width: 400px) {
+		  .sidebar a {
+			text-align: center;
+			float: none;
+		  }
+		}
+		
+		/* Style the navigation bar */
+		.navbar {
+		  width: relative;
+		  background-color: #555;
+		  border-left: 2px solid black;
+		  border-right: 2px solid black;
+		  border-bottom: 2px solid black;
+		  overflow: auto;
+		}
+
+		/* Navbar links */
+		.navbar a {
+		  float: left;
+		  text-align: center;
+		  padding: 12px;
+		  color: white;
+		  text-decoration: none;
+		  font-size: 17px;
+		}
+
+		/* Navbar links on mouse-over */
+		.navbar a:hover {
+		  background-color: #000;
+		}
+
+		/* Current/active navbar link */
+		.active {
+		  background-color: #F74356;
+		}
+
+		/* Add responsiveness - will automatically display the navbar vertically instead of horizontally on screens less than 500 pixels */
+		@media screen and (max-width: 500px) {
+		  .navbar a {
+			float: none;
+			display: block;
+		  }
+		}
+		
+		.boxed {
+		  padding: 10px;
+		  background-color: #8DAABA;
+		}
+		
+		table {
+		  margin: auto;
+		  border-collapse: collapse;
+		  border-spacing: 0;
+		  width: 500px;
+		  border: 1px solid #000;
+		}
+
+		th, td {
+		  text-align: center;
+		  padding: 16px;
+		  color: white;
+		}
+
+		tr:nth-child(even) {
+		  background-color: #F74356;
+		}
+		tr:nth-child(odd) {
+		  background-color: #555;
+		}
+		
+		.button {
+		  border-radius: 4px;
+		  background-color: #F74356;
+		  border: none;
+		  color: #FFFFFF;
+		  text-align: center;
+		  font-size: 24px;
+		  padding: 15px;
+		  width: 230px;
+		  transition: all 0.5s;
+		  cursor: pointer;
+		}
+
+		.button span {
+		  cursor: pointer;
+		  display: inline-block;
+		  position: relative;
+		  transition: 0.5s;
+		}
+
+		.button span:after {
+		  content: '\00bb';
+		  position: absolute;
+		  opacity: 0;
+		  top: 0;
+		  right: -20px;
+		  transition: 0.5s;
+		}
+
+		.button:hover span {
+		  padding-right: 25px;
+		}
+
+		.button:hover span:after {
+		  opacity: 1;
+		  right: 0;
+		}
+		
+	</style>
+</head>
+
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+
+{% if user.is_authenticated %}
+	{% if user.username != 'professor' %}
+		<meta http-equiv="Refresh" content="0; url=http://localhost:8000/functions/" />
+	{% endif %}
+{% else %}
+	<meta http-equiv="Refresh" content="0; url=http://localhost:8000/user/login/" />
+{% endif %}
+
+
+<div class="header">
+  <h2>DB-Backed Web Application</h2>
+  <p>Made By Ryan Bell & Paul Schmid</p>
+</div>
+
+<div class="navbar">
+  <a class="active" href="{% url 'login' %}"><i class="fa fa-fw fa-home"></i> Home</a>
+  <a href="http://localhost:8000/functions/"><i class="fa fa-fw fa-envelope"></i> Functions</a>
+  <a href="http://localhost:8000/admin" style="float:right"><i class="fa fa-fw fa-user"></i> Administrator Portal</a>
+</div>
+
+<!-- The sidebar -->
+<div class="sidebar">
+	<div class="boxed">
+		{% if user.is_authenticated %}
+		<h3>Logged in: {{ user.username }}</h3>
+		<p><button class="button" onclick="window.location.href = '{% url 'logout' %}';">Logout</button></p>
+		{% else %}
+		<h2>You are not logged in</h2>
+		<button class="button" onclick="window.location.href = '{% url 'login' %}';">Login Page</button>
+		{% endif %}
+	</div>
+</div>
+
+<!-- Page content -->
+<div class="content">
+	<h1>List of course sections and number of students enrolled in each section that Professor {{request.GET.name}} taught for the given semester:</h1>
+	<table style="width: 90%">
+	  	<th><u>Course</th><th><u>Section</th><th><u>Year</th><th><u>Students</th>
+		{% for i in data%}
+        <tr>
+            <td align="center">{{ i.course_id}}</td>
+            <td align="center">{{i.sec_id}}</td>
+            <td align="center">{{i.year}}</td>
+            <td align="center">{{i.co}}</td>
+        </tr>
+		{% endfor %}
+	</table>
+</div>
+{% endblock %}

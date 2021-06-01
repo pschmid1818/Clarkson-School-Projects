@@ -1,0 +1,64 @@
+#include<iostream>
+#include<cstring>
+#include<vector>
+using namespace std;
+
+int main()
+{
+	string str;
+	string temp;
+	cout <<"Enter a phrase\n";
+	getline(cin,str);
+	int w=str.length();
+	
+	vector<string> v;
+	
+	for (int i=0; i<w; i++)
+	{
+		if ((str[i]=='.'||str[i]=='?'||str[i]=='!'||str[i]==',') && str[i+1]==' ')
+		{
+			i++;
+		}
+		if (str[i]==' '||str[i]=='.'||str[i]=='?'||str[i]=='!'||str[i]==',')
+		{
+			v.push_back(temp);
+			temp.clear();
+			i++;
+		}
+		temp=temp+str[i];
+	}
+	
+	for (int i=0; i,v.size(); i++)
+	{
+		bool checker=false;
+		int star=0;
+		for(int j=0; j<i; j++)
+		{	
+			if (v[i]==v[j])
+			{
+				checker=true;
+			}
+		}
+		
+		for (int j=i; j<v.size(); j++)
+		{
+			if (v[i]==v[j] && !checker)
+			{
+				star++;
+			}
+		}
+		
+		if (star>=1)
+		{
+			cout <<v[i] <<":";
+			for (int k=0; k<star; k++)
+			{
+				cout <<"*";
+			}
+			cout <<"\n";
+		}	
+	}
+	return 0;
+}
+
+
